@@ -1,48 +1,141 @@
-from time import sleep
-while True:
-    print("----------Projeto Calendário!!----------")
-    sleep(1)
-    print("""
-    |   [d][s][t][q][qu][s][sa]         |
-    |   [31][1][2][3][4][5][6]          |
-    |   [7][8][9][10][11[12][13]        |
-    |   [14][15][16][7][18][19][20]     |
-    |   [21][22][23][24][25][26][27]    |
-    |   [28][29][30]                    |
-        """)
-    sleep(1)
-    opções = input("""
+import PySimpleGUI as sg
+import calendar as cal
 
-    [VERDE] = Alarme
-    [AZUL] = Agendamentos
-    [ROXO] = Lembretes
-    [VERMELHO] = Notas
-    [AMARELO] = Tarefas
-    [ROSA] = Outros
+sg.theme("DarkGrey16")
 
-    Qual a sua opção de marcação:         
-    """).strip().upper()
 
-    if opções == "VERDE":
-        print("Você escolheu a opção de alarme.")
-        dia = input("Insira o dia desejado: ")
-        mes = input("Insira o mês desejado: ")
-        ano = input("Insira o ano desejado: ")
-        verificação = input(f"A data é {dia}/{mes}/{ano}, correto? [S/N]").strip().upper()
-        if verificação == ["S", "SIM"]:
-            print("Pronto podemos seguir!")
-        else:
-            ("Aqui precisa coloca para retornar uma função do dia, mes e ano")
-    elif opções	== "AZUL":
-        print("ok2")
-    elif opções	== "ROXO":
-        print("ok3")
-    elif opções	== "VERMELHO":
-        print("ok4")
-    elif opções	== "AMARELO":
-        print("ok5")
-    elif opções	== "ROSA":
-        print("ok6")
-    else:
-        print("Opção Inválida!")
-        break
+def front():
+    flayout = [
+    [sg.Text("Bem vindo!", font=("Helvetica", 20))],
+    [sg.Button("Visualisar Calendário")], 
+    [sg.Button("Sair do aplicativo")]
+    ]
+
+
+    window = sg.Window("Calendary Project App", flayout, size=(500,200), element_justification="center")
+    button, values = window.read()
+    if button == "Visualizar Calendário":
+        window.close()
+    elif button == "Sair do aplicativo":
+        window.exit()
+front()
+def front2():
+    sg.theme("DarkGrey16")
+    flayout = [
+        [sg.Text("Páginas", size=(15,2), font=("Helvetica", 20))],
+        [sg.Button("Eventos",size=(20, 2))],
+        [sg.Button("Alarmes",size=(20, 2))],
+        [sg.Button("Tarefas",size=(20, 2))],
+        [sg.Button("Notas",size=(20, 2))],
+        [sg.Button("Lembretes",size=(20, 2))],
+        [sg.Button("Sair",size=(20, 2))]
+        ]
+    
+    window = sg.Window("Calendário", flayout, size=(700,500), element_justification="left")
+    button,values = window.read()
+    if button == "Eventos":
+        window.close()
+    elif button == "Alarmes":
+        window.close()
+    elif button == "Tarefas":
+        window.close()
+    elif button == "Notas":
+        window.close()
+    elif button == "Lembretes":
+        window.close()
+    elif button == "Sair":
+        window.exit()
+front2()
+def eventos():
+    sg.theme("DarkGrey16")
+
+    layout = [
+            [sg.Text("Aqui você marcará os seus eventos", font=("Arial",20))],
+            [sg.Button("Voltar para página anterior", size=(20,2))],
+            [sg.Button("Sair", size = (20,2))]
+    ]
+
+    window = sg.Window("Eventos", layout, size=(700,500), element_justification=("center"))
+    button, values = window.read()
+    if button == "Voltar para página anterior":
+        window.close()
+        front2()
+    elif button == "Sair":
+        window.close()
+        exit()
+eventos()
+def alarmes():
+    sg.theme("DarkGrey16")
+
+    layout = [
+            [sg.Text("Aqui você marcará os seus alarmes", font=("Arial",20))],
+            [sg.Button("Voltar para página anterior", size=(20,2))],
+            [sg.Button("Sair", size = (20,2))]
+    ]
+
+    window = sg.Window("Alarmes", layout, size=(700,500), element_justification=("center"))
+    button, values = window.read()
+    if button == "Voltar para página anterior":
+        window.close()
+        front2()
+    elif button == "Sair":
+        window.close()
+        exit()
+alarmes()
+def tarefas():
+    sg.theme("DarkGrey16")
+
+    layout = [
+            [sg.Text("Aqui você marcará as suas tarefas", font=("Arial",20))],
+            [sg.Button("Voltar para página anterior", size=(20,2))],
+            [sg.Button("Sair", size = (20,2))]
+    ]
+
+    window = sg.Window("Tarefas", layout, size=(700,500), element_justification=("center"))
+    button, values = window.read()
+    if button == "Voltar para página anterior":
+        window.close()
+        front2()
+    elif button == "Sair":
+        window.close()
+        exit()
+tarefas()
+def notas():
+    sg.theme("DarkGrey16")
+
+    layout = [
+            [sg.Text("Aqui você marcará as suas anotações", font=("Arial",20))],
+            [sg.Button("Voltar para página anterior", size=(20,2))],
+            [sg.Button("Sair", size = (20,2))]
+    ]
+
+    window = sg.Window("Anotações", layout, size=(700,500), element_justification=("center"))
+    button, values = window.read()
+    if button == "Voltar para página anterior":
+        window.close()
+        front2()
+    elif button == "Sair":
+        window.close()
+        exit()
+notas()
+def lembretes():
+    sg.theme("DarkGrey16")
+
+    layout = [
+            [sg.Text("Aqui você marcará os seus lembretes", font=("Arial",20))],
+            [sg.Button("Voltar para página anterior", size=(20,2))],
+            [sg.Button("Sair", size = (20,2))]
+    ]
+
+    window = sg.Window("lembretes", layout, size=(700,500), element_justification=("center"))
+    button, values = window.read()
+    if button == "Voltar para página anterior":
+        window.close()
+        front2()
+    elif button == "Sair":
+        window.close()
+        exit()
+lembretes()
+
+
+
