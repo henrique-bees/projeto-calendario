@@ -10,7 +10,7 @@ sg.theme("DarkGrey4")                   #Definindo o thema da janela inicial
 def eventos():
     #=================================================================================================================================================#
     #Tema
-    sg.theme("DarkGrey3")
+    sg.theme("DarkGrey4")
 
     #Layout Interface
     layout = [
