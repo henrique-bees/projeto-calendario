@@ -5,6 +5,7 @@ import calendar as cal                  #Importando biblioteca calendario para u
 
 sg.theme("DarkGrey4")                   #Definindo o thema da janela inicial
 
+
 #Inserindo uma função para a janela eventos     /:3
 def eventos():
     #=================================================================================================================================================#
@@ -15,7 +16,7 @@ def eventos():
     layout = [
         [sg.Text("Aqui você marcará os seus eventos", font=("Arial", 20))],
         [sg.Column([
-            [sg.Button("Voltar para página anterior", size=(20, 2), button_color="#2e689f"), sg.Button("Sair", size=(20, 2), button_color="#2e689f")]], element_justification="center", expand_x=True, pad=(0, (220, 0)))],
+            [sg.Button("Marcar novo evento", size=(20, 2), button_color="#2e689f"), sg.Button("Voltar para página anterior", size=(20, 2), button_color="#2e689f")]], element_justification="center", expand_x=True, pad=(0, (220, 0)))],
            
     ]
     #=================================================================================================================================================#
@@ -24,15 +25,21 @@ def eventos():
     button, values = window.read()
     
     #Fechar App
-    if button == "Sair" or button == sg.WINDOW_CLOSED:
+    if button == sg.WINDOW_CLOSED:
         exit()
     window.close()
     
     #Voltar para página anterior
     if button == "Voltar para página anterior":
         front2()
+    elif button == "Marcar novo evento":
+        window.close()
+
+    
+    
     #=================================================================================================================================================#
 #Inserindo uma função para a janela alarmes     /:4
+
 def alarmes():
     #=================================================================================================================================================#
     #Tema
@@ -146,15 +153,16 @@ def front():
     flayout = [                                                                                     
     
         #Utilizando a função sg.Text para colocar texto na paginal inicial, aqui eu consigo manipular o texto, tamanho, fonte.
-        [sg.Text("Bem vindo!", font=("Arial", 20))],            
-        
+        [sg.Text("Seja Bem-vindo!", font=("Arial", 13))],
+        [sg.Text("Insira o seu nome", font=("Arial", 13))],            
+        [sg.Input(key="-NAME-", size=(20,2))],
         #Utilizando a função Column para criar uma coluna na interface gráfica, ela serve para organizar elementos GUI, como textos, botões, entradas, etc
         #Aqui nesse caso, eu queria fazer com que os botões ficassem isolados na parte inferior da janela por isso usei ela.
         [sg.Column([                                            
             #Defini a cor dos botões, o seu nome, e sua cordenada na interface
             
-            [sg.Button("Visualizar Calendário", button_color="#2e689f"), sg.Button("Sair do aplicativo", button_color=("#2e689f"))],
-        ], element_justification="center", expand_x=True, pad=(0, (120, 0)))],
+            [sg.Button("Ver Calendário", button_color="#2e689f"), sg.Button("Sair do aplicativo", button_color=("#2e689f"))],
+        ], element_justification="center", expand_x=True, pad=(0, (80, 0)))],
     
     ]
     #=================================================================================================================================================#
@@ -171,7 +179,7 @@ def front():
     #Entretanto, caso eu clicar no "Sair do Aplicativo", ele fechará o app.
     #Podem se perguntar pra que esse tal de "sg.WINDOW_CLOSER", ele serve para fazer com que o X de fechar janelas, que a gnt usa pra fechar tudo, funcione corretamente.
     
-    if button == "Visualizar Calendário":
+    if button == "Ver Calendário":
         window.close()
     elif button == "Sair do aplicativo" or button == sg.WINDOW_CLOSED:
         exit()
@@ -184,8 +192,8 @@ def front2():
     #Setando o tema
     sg.theme("DarkGrey4")
     
-    #Definindo as características da janela main com a lista flayout
-    flayout = [
+    #Definindo uma coluna para separar a tela
+    Coluna1 = [
         
         #Definindo botões, seus respecitivos tamanhos e cores, aqui podemos colocar qualquer cor hexadecimal possível.
         [sg.Button("Eventos", size=(20, 2), button_color=("#2e689f"))],
@@ -195,9 +203,13 @@ def front2():
         [sg.Button("Lembretes", size=(20, 2), button_color=("#2e689f"))],
         [sg.Button("Sair", size=(20, 2), button_color=("#2e689f"))]
     ]
+    #Definindo o layout para chamar a coluna , sg.VerticalSeparator() é para tração uma linha na tela
+    layout = [
+        [sg.Col(Coluna1), sg.VerticalSeparator()]
+    ]
     #=================================================================================================================================================#
     #Definindo as características próprias da janela main, titulo, tamanho, e cordenada na interface
-    window = sg.Window("Calendário", flayout, size=(700, 300), element_justification="left")
+    window = sg.Window("Calendário", layout, size=(700, 300), element_justification="left")
     
     #Lendo as variáveis
     button, values = window.read()
