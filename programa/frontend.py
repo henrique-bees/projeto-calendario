@@ -3,14 +3,36 @@ import calendar as cal                  #Importando biblioteca calendario para u
 
 #As partes "MAINs" do código ficam no final para todo o conteudo externo, (funções) poder ser lido perfeitamente.
 
-sg.theme("DarkGrey4")                   #Definindo o thema da janela inicial
+sg.theme("DarkGrey16")                   #Definindo o thema da janela inicial
 
+#Função para Animação da barra de progresso     /:8
+def init():
+    layout = [
+	#Aqui coloco a função da barra de progresso, com o valor maximo de 1000, #Na horizontal, com o tamanho (400,50)
+    [sg.ProgressBar(max_value=1000, orientation="h", size=(400,50), key="-PROG-")],
+    ]
+
+    #Aqui é uma janela normal mas sem os titulos, botao de fechar ou minimizar
+    window = sg.Window("", layout, size=(400,50), no_titlebar=True)
+
+    #Looping para dar update na barra de progresso
+    #Para aumentar a velocidade do update é so alterar o passo 2 para um maior
+    for i in range(0,1000,2):
+        #O paramentro (timeout=1) especifica que o programa aguardara 1 
+        #milissegundo para receber um evento.
+        event, values = window.read(timeout=1)
+        
+        #Aqui ele pega a key de progresso la de cima e coloca a função update
+        #para refletir o progresso atual.
+        window["-PROG-"].UpdateBar(i+1)
+    window.close()
+    front()
 
 #Inserindo uma função para a janela eventos     /:3
 def eventos():
     #=================================================================================================================================================#
     #Tema
-    sg.theme("DarkGrey4")
+    sg.theme("DarkGrey16")
 
     #Layout Interface
     layout = [
@@ -38,12 +60,12 @@ def eventos():
     
     
     #=================================================================================================================================================#
-#Inserindo uma função para a janela alarmes     /:4
 
+#Inserindo uma função para a janela alarmes     /:4
 def alarmes():
     #=================================================================================================================================================#
     #Tema
-    sg.theme("DarkGrey4")
+    sg.theme("DarkGrey16")
 
     #Layout Interface
     layout = [
@@ -69,7 +91,7 @@ def alarmes():
 def tarefas():
     #=================================================================================================================================================#
     #Tema
-    sg.theme("DarkGrey4")
+    sg.theme("DarkGrey16")
     
     #Layout Interface
     layout = [
@@ -96,7 +118,7 @@ def tarefas():
 def anotações():
     #=================================================================================================================================================#
     #Temas
-    sg.theme("DarkGrey4")
+    sg.theme("DarkGrey16")
 
     #Layout Interface
     layout = [
@@ -123,7 +145,7 @@ def anotações():
 def lembretes():
     #=================================================================================================================================================#
     #Temas
-    sg.theme("DarkGrey4")
+    sg.theme("DarkGrey16")
 
     #Layout da Interface
     layout = [
@@ -181,16 +203,16 @@ def front():
     
     if button == "Ver Calendário":
         window.close()
+        front2()
     elif button == "Sair do aplicativo" or button == sg.WINDOW_CLOSED:
         exit()
     #=================================================================================================================================================#
-front()
 
 #Pagina Inicial /  "Página Main                 /:2
 def front2():
     #=================================================================================================================================================#
     #Setando o tema
-    sg.theme("DarkGrey4")
+    sg.theme("DarkGrey16")
     
     #Definindo uma coluna para separar a tela
     Coluna1 = [
@@ -231,4 +253,8 @@ def front2():
     elif button == "Sair" or button == sg.WINDOW_CLOSED:
         exit()
     #=================================================================================================================================================#
-front2()
+
+
+init()
+
+
