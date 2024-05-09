@@ -35,7 +35,7 @@ def login():
         senha = values["-SENHA-"]
 
         # Banco de Dados
-        conexao = sq.connect("registro.db")
+        conexao = sq.connect("programa/registro.db")
         cursor = conexao.cursor()
         cursor.execute("SELECT nome, senha FROM usuarios WHERE nome = ?",
                        (usuario,))
@@ -86,13 +86,8 @@ def registro():
                 window.close()
                 sg.popup_timed("Registro realizado com sucesso!",
                                auto_close=2)
-                conexao = sq.connect("registro.db")
+                conexao = sq.connect("programa/registro.db")
                 cursor = conexao.cursor()
-                cursor.execute("""CREATE TABLE IF NOT EXISTS usuarios (
-                                   id INTEGER PRIMARY KEY,
-                                   nome TEXT,
-                                   senha TEXT
-                                   )""")
                 cursor.execute(
                     "INSERT INTO usuarios (nome, senha) VALUES (?, ?)",
                     (usuario, senha))
@@ -135,15 +130,19 @@ def nova_senha():
             login()
             break
         elif event == "Ok":
+            usuario = values["-USUARIO-"]
             senha = values["-SENHA-"]
             senha2 = values["-SENHA2-"]
-            conexao = sq.connect("registro.db")
-            cursor = conexao.cursor()
             if senha == senha2:
+                conexao = sq.connect("programa/registro.db")
+                cursor = conexao.cursor()
+                cursor.execute("UPDATE usuarios SET senha = ? WHERE nome = ?",
+                               (senha, usuario))
+                conexao.commit()
+                conexao.close()
                 window.close()
                 sg.popup_timed("A nova senha foi cadastrada com sucesso!",
                                auto_close_duration=2)
-                cursor.execute("UPDATE usuarios SET senha = ? WHERE = ?")
                 sleep(2)
                 login()
             else:
