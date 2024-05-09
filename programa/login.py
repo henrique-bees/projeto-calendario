@@ -19,11 +19,11 @@ def login():
         [sg.Column([
             [sg.T("Retirando Marca d'água")]],
             expand_x=True, pad=(0, (50, 0))
-            )]
+        )]
     ]
     window = sg.Window("Login", layout, size=(400, 160))
 
-    event,values = window.read()
+    event, values = window.read()
     if event == "Voltar":
         window.close()
         registro()
@@ -33,8 +33,8 @@ def login():
     elif event == "Ok":
         usuario = values["-NAME-"]
         senha = values["-SENHA-"]
-        
-        #Banco de Dados
+
+        # Banco de Dados
         conexao = sq.connect("registro.db")
         cursor = conexao.cursor()
         cursor.execute("SELECT nome, senha FROM usuarios WHERE nome = ?",
@@ -68,11 +68,11 @@ def registro():
         [sg.Column([
             [sg.T("Retirando Marca d'água")]],
             expand_x=True, pad=(0, (50, 0))
-            )]
+        )]
     ]
     window = sg.Window("Registro", layout, size=(400, 185))
     while True:
-        event,values = window.read()
+        event, values = window.read()
         if event == sg.WINDOW_CLOSED or event == "Cancel":
             break
         elif event == "Já possuo um login":
@@ -85,7 +85,7 @@ def registro():
             if senha == senha2:
                 window.close()
                 sg.popup_timed("Registro realizado com sucesso!",
-                                   auto_close=2)
+                               auto_close=2)
                 conexao = sq.connect("registro.db")
                 cursor = conexao.cursor()
                 cursor.execute("""CREATE TABLE IF NOT EXISTS usuarios (
@@ -94,23 +94,23 @@ def registro():
                                    senha TEXT
                                    )""")
                 cursor.execute(
-                        "INSERT INTO usuarios (nome, senha) VALUES (?, ?)",
-                        (usuario, senha))
+                    "INSERT INTO usuarios (nome, senha) VALUES (?, ?)",
+                    (usuario, senha))
                 conexao.commit()
                 conexao.close()
                 login()
             else:
                 sg.popup_timed(
-                        "As senhas não coincidem, por favor, tente novamente",
-                        auto_close_duration=2)
+                    "As senhas não coincidem, por favor, tente novamente",
+                    auto_close_duration=2)
 
 
 def nova_senha():
     sg.theme("DarkGrey16")
     frame = [
-        [sg.T("Usuário:             "), 
+        [sg.T("Usuário:             "),
          sg.I(key="-USUARIO-")],
-         [sg.HorizontalSeparator()],
+        [sg.HorizontalSeparator()],
         [sg.T("Senha:               "),
          sg.I(key="-SENHA-", password_char="*")],
         [sg.T("Confirmar Senha:"), sg.I(key="-SENHA2-", password_char="*")],
@@ -123,11 +123,11 @@ def nova_senha():
         [sg.Column([
             [sg.T("Retirando Marca d'água")]],
             expand_x=True, pad=(0, (50, 0)
-            ))]
+                                ))]
     ]
     window = sg.Window("Recuperação de senha", layout, size=(400, 145))
     while True:
-        event,values = window.read()
+        event, values = window.read()
         if event == sg.WINDOW_CLOSED:
             break
         if event == "Voltar":
@@ -151,6 +151,7 @@ def nova_senha():
                     "As senhas não coincidem, por favor, tente novamente",
                     auto_close_duration=2)
 
+
 # nova_senha()
-#login()
+# login()
 registro()
