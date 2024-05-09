@@ -127,26 +127,41 @@ def anotações():
     #=================================================================================================================================================#
     #Temas
     sg.theme("DarkGrey16")
-
     #Layout Interface
     layout = [
-        [sg.Text("Aqui você marcará as suas anotações", font=("Arial", 20))],
+        [sg.CalendarButton("Escolher Data", size=(10,1), button_color="#2e689f"), sg.Text("-- -- -- -- -- --", key="-DATA-")],
+        [sg.T("Escreva sua anotação:", size=(16,1)), sg.I(key="-NOTA-", font=("None 15"), size=(32,1))],
+        [sg.Table(values="", headings=["Index", "Data", "Anotação"], key="-TABLE-",enable_events=True, size=(500,10),auto_size_columns=False, col_widths=[5,9,30], vertical_scroll_only=False, justification="l", font=("None 15"))],
         [sg.Column([
-            [sg.Button("Voltar para página anterior", size=(20, 2), button_color="#2e689f"), sg.Button("Sair", size=(20, 2), button_color="#2e689f")]], element_justification="center", expand_x=True, pad=(0, (220, 0)))],
+            [sg.B("Adicionar", size=(20,2), button_color= "#2e689f"), sg.B("Deletar", size=(20,2), button_color="#2e689f", key="-DEL-"),sg.Button("Voltar para página anterior", size=(20, 2), button_color="#2e689f"), ]],element_justification="center", expand_x=True, pad=(0, (10, 0)))],
     ]
     #=================================================================================================================================================#
     #Info Janela
-    window = sg.Window("Anotações", layout, size=(700, 300), element_justification=("center"))
-    button, values = window.read()
-    
-    #Fechar App
-    if button == "Sair" or button == sg.WINDOW_CLOSED:
-        exit()
-    window.close()
-    
-    #Voltar para pagina anterior
-    if button == "Voltar para página anterior":
-        front2()
+    window = sg.Window("Anotações", layout, size=(600, 400), element_justification=("left"))
+    notas = []
+    c = 1
+    while True: 
+        button, values = window.read()
+        #Fechar App
+        if button == "Sair" or button == sg.WINDOW_CLOSED:
+            window.close()
+            break
+        elif button == "Adicionar":
+            data = window["-DATA-"].get().split()[0]
+            nota = [[c, data, values["-NOTA-"]]]
+            notas += nota
+            window["-TABLE-"].update(notas)
+            window["-NOTA-"].update("")
+            c += 1
+        elif button == "-DEL-":
+            if values["-TABLE-"]:
+                index = values["-TABLE-"][0]
+                del notas[index]
+                window["-TABLE-"].update(notas)
+        #Voltar para pagina anterior
+        elif button == "Voltar para página anterior":
+            window.close()
+            front2()
     #=================================================================================================================================================#
 
 #Inserindo uma função para a janela lembretes   /:7
@@ -262,7 +277,6 @@ def front2():
         exit()
     #=================================================================================================================================================#
 
-
 init()
-
+#anotações()
 
