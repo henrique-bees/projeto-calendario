@@ -1,6 +1,7 @@
 import PySimpleGUI as sg
 from time import sleep
 import sqlite3 as sq
+from backend import verificar_senha
 
 
 def login():
@@ -83,17 +84,25 @@ def registro():
             senha = values["-SENHA-"]
             senha2 = values["-SENHA2-"]
             if senha == senha2:
-                window.close()
-                sg.popup_timed("Registro realizado com sucesso!",
-                               auto_close=2)
-                conexao = sq.connect("programa/registro.db")
-                cursor = conexao.cursor()
-                cursor.execute(
-                    "INSERT INTO usuarios (nome, senha) VALUES (?, ?)",
-                    (usuario, senha))
-                conexao.commit()
-                conexao.close()
-                login()
+                valido = verificar_senha(senha)
+                if valido is True:
+                    window.close()
+                    sg.popup_timed("Registro realizado com sucesso!",
+                                   auto_close=2)
+                    conexao = sq.connect("programa/registro.db")
+                    cursor = conexao.cursor()
+                    cursor.execute(
+                        "INSERT INTO usuarios (nome, senha) VALUES (?, ?)",
+                        (usuario, senha))
+                    conexao.commit()
+                    conexao.close()
+                    login()
+                else:
+                    sg.popup_timed("Senha invalida, as senhas devem possuir "
+                                   "pelo menos uma letra maiuscula, uma "
+                                   "minuscula, um numero, um caractere "
+                                   "especial, e ter entre 8 e 16 caracteres",
+                                   auto_close_duration=2)
             else:
                 sg.popup_timed(
                     "As senhas não coincidem, por favor, tente novamente",
@@ -134,17 +143,20 @@ def nova_senha():
             senha = values["-SENHA-"]
             senha2 = values["-SENHA2-"]
             if senha == senha2:
-                conexao = sq.connect("programa/registro.db")
-                cursor = conexao.cursor()
-                cursor.execute("UPDATE usuarios SET senha = ? WHERE nome = ?",
-                               (senha, usuario))
-                conexao.commit()
-                conexao.close()
-                window.close()
-                sg.popup_timed("A nova senha foi cadastrada com sucesso!",
-                               auto_close_duration=2)
-                sleep(2)
-                login()
+                valido = verificar_senha(senha)
+                if valido:
+                    conexao = sq.connect("programa/registro.db")
+                    cursor = conexao.cursor()
+                    cursor.execute(
+                        "UPDATE usuarios SET senha = ? WHERE nome = ?",
+                        (senha, usuario))
+                    conexao.commit()
+                    conexao.close()
+                    window.close()
+                    sg.popup_timed("A nova senha foi cadastrada com sucesso!",
+                                   auto_close_duration=2)
+                    sleep(2)
+                    login()
             else:
                 sg.popup_timed(
                     "As senhas não coincidem, por favor, tente novamente",
