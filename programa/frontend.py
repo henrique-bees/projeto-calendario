@@ -313,13 +313,15 @@ def front2():
 
     # Definindo uma coluna para separar a tela
     Coluna1 = [
-
         # Definindo botões, seus respecitivos tamanhos e cores, aqui podemos
         # colocar qualquer cor hexadecimal possível.
-        [sg.Button("Eventos", size=(20, 2), button_color=("#2e689f"))],
-        [sg.Button("Alarmes", size=(20, 2), button_color=("#2e689f"))],
-        [sg.Button("Tarefas", size=(20, 2), button_color=("#2e689f"))],
-        [sg.Button("Lembretes", size=(20, 2), button_color=("#2e689f"))],
+        
+        # Definindo botões, seus respectivos tamanhos e cores, aqui podemos
+        # colocar qualquer cor hexadecimal possível.
+        [sg.Button("Eventos", size=(20, 2), button_color=("#2e689f"), pad=(0, 10))],
+        [sg.Button("Alarmes", size=(20, 2), button_color=("#2e689f"), pad=(0, 10))],
+        [sg.Button("Tarefas", size=(20, 2), button_color=("#2e689f"), pad=(0, 10))],
+        [sg.Button("Lembretes", size=(20, 2), button_color=("#2e689f"), pad=(0, 10))],
     ]
     # Definindo o layout para chamar a coluna , sg.VerticalSeparator() é para
     # tração uma linha na tela
@@ -330,7 +332,7 @@ def front2():
     # Definindo as características próprias da janela main, titulo, tamanho, e
     # cordenada na interface
     window = sg.Window("Calendário", layout, size=(
-        550, 205), element_justification="left")
+        550, 250), element_justification="left")
 
     # Lendo as variáveis
     button, values = window.read()
