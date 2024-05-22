@@ -1,3 +1,4 @@
+import backend as bc
 import PySimpleGUI as sg  # Importando biblioteca PySimpleGUI para o front-end
 # Importando biblioteca calendario para um possível acréscimo no futuro
 # import calendar as cal - retirar quando for utilizar
@@ -151,6 +152,7 @@ def tarefas():
 
 
 def anotações():
+    tipo = "anotacoes"
     # =================================================================================================================================================#
     # Temas
     sg.theme("DarkGrey16")
@@ -188,11 +190,13 @@ def anotações():
             break
         elif button == "Adicionar":
             data = window["-DATA-"].get().split()[0]
+            titulo = values["-NOTA-"]
             nota = [[c, data, values["-NOTA-"]]]
             notas += nota
             window["-TABLE-"].update(notas)
             window["-NOTA-"].update("")
             c += 1
+            bc.criar(tipo, data, titulo)
         elif button == "-DEL-":
             if values["-TABLE-"]:
                 index = values["-TABLE-"][0]

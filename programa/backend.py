@@ -1,11 +1,14 @@
-class Pins:
-    def __init__(self, usuario, tipo, titulo):
-        self.usuario = usuario
-        self.tipo = tipo
-        self.titulo = titulo
+import sqlite3 as sq
+import uuid
 
-    def criar(self):
-        pass
+
+def criar(tipo, data, nota):
+    conexao = sq.connect("programa/registro.db")
+    cursor = conexao.cursor()
+    cursor.execute("INSERT INTO ? (data, nota) VALUES = (?, ?)",
+                   (tipo, data, nota))
+    conexao.commit()
+    conexao.close()
 
 
 def verificar_senha(senha):
@@ -19,3 +22,30 @@ def verificar_senha(senha):
             return True
     else:
         return False
+
+
+def criar_sessao(nome, senha):
+    conexao = sq.connect("programa/registro.db")
+    cursor = conexao.cursor()
+    cursor.execute("SELECT id FROM usuarios WHERE nome = ? AND senha = ?",
+                   (nome, senha))
+    usuario = cursor.fetchone()
+    if usuario:
+        id_usuario = usuario[0]
+        token_sessao = str(uuid.uuid4())
+        cursor.execute(
+            "INSERT INTO sessions (user_id, session_token) VALUES (?, ?)",
+            (id_usuario, token_sessao))
+        conexao.commit()
+        return token_sessao
+    else:
+        return None
+
+
+def verificar_sessao(token_sessao):
+    conexao = sq.connect("programa/registro.db")
+    cursor = conexao.cursor()
+    cursor.execute("SELECT user_id FROM sessions WHERE session_token = ?",
+                   (token_sessao))
+    session = cursor.fetchone()
+    return session is not None

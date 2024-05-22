@@ -1,7 +1,7 @@
 import PySimpleGUI as sg
 from time import sleep
 import sqlite3 as sq
-from backend import verificar_senha
+from backend import verificar_senha, criar_sessao
 
 
 def login():
@@ -41,6 +41,7 @@ def login():
         cursor.execute("SELECT nome, senha FROM usuarios WHERE nome = ?",
                        (usuario,))
         busca = cursor.fetchone()
+        criar_sessao(usuario, senha)
         if busca is not None and busca[1] == senha:
             sg.popup_timed("Login efetuado com sucesso",
                            auto_close_duration=2)
