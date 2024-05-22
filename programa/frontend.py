@@ -1,4 +1,4 @@
-import backend as bc
+
 import PySimpleGUI as sg  # Importando biblioteca PySimpleGUI para o front-end
 # Importando biblioteca calendario para um possível acréscimo no futuro
 # import calendar as cal - retirar quando for utilizar
@@ -14,12 +14,10 @@ def icon():
 icon = icon()
 sg.set_global_icon(icon)
 
-
-sg.theme("DarkGrey16")  # Definindo o thema da janela inicial
+# Definindo o thema da janela inicial
+sg.theme("DarkGrey16")  
 
 # Função para Animação da barra de progresso     /:8
-
-
 def init():
     layout = [
         # Aqui coloco a função da barra de progresso, com o valor maximo de
@@ -42,50 +40,86 @@ def init():
         # para refletir o progresso atual.
         window["-PROG-"].UpdateBar(i+1)
     window.close()
-    front()
+    front2()
 
 # Inserindo uma função para a janela eventos     /:3
-
-
 def eventos():
     # =================================================================================================================================================#
-    # Tema
+    # Temas
     sg.theme("DarkGrey16")
-
     # Layout Interface
     layout = [
-        [sg.Text("Aqui você marcará os seus eventos", font=("Arial", 20))],
+        
+        #Botão de Calendário
+        [sg.CalendarButton("Escolher Data", size=(
+            10, 1), button_color="#2e689f"), sg.Text("-- -- -- -- -- --",
+                                                     key="-DATA-")],
+        #Input de nota
+        [sg.T("Insira o seu evento:", size=(16, 1)), sg.I(
+            key="-EVENTO-", font=("None 15"), size=(40, 1))],
+        
+        #Criar a Tabela com index, data, nota
+        #Headings são os titulos, col_widths são os tamanhos das colunas
+        [sg.Table(values="", headings=["Index", "Data", "Evento"],
+                  key="-TABLE-", enable_events=True, size=(500, 10),
+                  auto_size_columns=False, col_widths=[5, 9, 30],
+                  vertical_scroll_only=False, justification="l",
+                  font=("None 15"))],
+        
+        #Criar coluna, inserir botões de adicionar e deletar, dar keys a eles.
         [sg.Column([
-            [sg.Button("Marcar novo evento", size=(20, 2),
-                       button_color="#2e689f"),
-             sg.Button("Voltar para página anterior", size=(20, 2),
-                       button_color="#2e689f")]],
-            element_justification="center",
-            expand_x=True, pad=(0, (220, 0)))],
-
+            [sg.B("Adicionar", size=(20, 2), button_color="#2e689f"),
+             sg.B("Deletar", size=(20, 2), button_color="#2e689f",
+                  key="-DEL-"), sg.Button("Voltar para página anterior",
+                                          size=(20, 2),
+                                          button_color="#2e689f"), ]],
+            element_justification="center", expand_x=True, pad=(0, (10, 0)))],
     ]
     # =================================================================================================================================================#
     # Info Janela
-    window = sg.Window("Eventos", layout, size=(700, 300),
-                       element_justification=("center"))
-    button, values = window.read()
-
-    # Fechar App
-    if button == sg.WINDOW_CLOSED:
-        exit()
-    window.close()
-
-    # Voltar para página anterior
-    if button == "Voltar para página anterior":
-        front2()
-    elif button == "Marcar novo evento":
-        window.close()
-
-    # =================================================================================================================================================#
+    window = sg.Window("Eventos", layout, size=(
+        600, 400), element_justification=("left"))
+    
+    #Contadores
+    eventos = []
+    c = 1
+    
+    #Condições
+    while True:
+        button, values = window.read()
+        
+        # Fechar App
+        if button == sg.WINDOW_CLOSED:
+            window.close()
+            break
+        
+        #Botão de Adicionar notas
+        elif button == "Adicionar":
+            titulo = values["-EVENTO-"]
+            if titulo != "":
+                data = window["-DATA-"].get().split()[0]
+                nota = [[c, data, values["-EVENTO-"]]]
+                eventos += nota
+                window["-TABLE-"].update(eventos)
+                window["-EVENTO-"].update("")
+                c += 1
+            else:
+                sg.popup_timed("É necessário inserir uma tarefa",
+                           auto_close_duration=2)
+        
+        #Botão de deletar alguma nota
+        elif button == "-DEL-":
+            if values["-TABLE-"]:
+                index = values["-TABLE-"][0]
+                del eventos[index]
+                window["-TABLE-"].update(eventos)
+        
+        # Voltar para pagina anterior
+        elif button == "Voltar para página anterior":
+            window.close()
+            front2()
 
 # Inserindo uma função para a janela alarmes     /:4
-
-
 def alarmes():
     # =================================================================================================================================================#
     # Tema
@@ -116,58 +150,30 @@ def alarmes():
     # =================================================================================================================================================#
 
 # Inserindo uma função para a janela tarefas     /:5
-
-
 def tarefas():
-    # =================================================================================================================================================#
-    # Tema
-    sg.theme("DarkGrey16")
-
-    # Layout Interface
-    layout = [
-        [sg.Text("Aqui você marcará as suas tarefas", font=("Arial", 20))],
-        [sg.Column([
-            [sg.Button("Voltar para página anterior", size=(20, 2),
-                       button_color="#2e689f"),
-             sg.Button("Sair", size=(20, 2), button_color="#2e689f")]],
-            element_justification="center", expand_x=True, pad=(0, (220, 0)))],
-    ]
-    # =================================================================================================================================================#
-    # Info Janela
-    window = sg.Window("Tarefas", layout, size=(700, 300),
-                       element_justification=("center"))
-    button, values = window.read()
-
-    # Fechar App
-    if button == "Sair" or button == sg.WINDOW_CLOSED:
-        exit()
-    window.close()
-
-    # Voltar para página anterior
-    if button == "Voltar para página anterior":
-        front2()
-    # =================================================================================================================================================#
-
-# Inserindo uma função para a janela anotações   /:6
-
-
-def anotações():
-    tipo = "anotacoes"
     # =================================================================================================================================================#
     # Temas
     sg.theme("DarkGrey16")
     # Layout Interface
     layout = [
+        
+        #Botão de Calendário
         [sg.CalendarButton("Escolher Data", size=(
             10, 1), button_color="#2e689f"), sg.Text("-- -- -- -- -- --",
                                                      key="-DATA-")],
-        [sg.T("Escreva sua anotação:", size=(16, 1)), sg.I(
-            key="-NOTA-", font=("None 15"), size=(32, 1))],
-        [sg.Table(values="", headings=["Index", "Data", "Anotação"],
+        #Input de nota
+        [sg.T("Insira a sua tarefa:", size=(16, 1)), sg.I(
+            key="-TAREFA-", font=("None 15"), size=(40, 1))],
+        
+        #Criar a Tabela com index, data, nota
+        #Headings são os titulos, col_widths são os tamanhos das colunas
+        [sg.Table(values="", headings=["Index", "Data", "Tarefas"],
                   key="-TABLE-", enable_events=True, size=(500, 10),
                   auto_size_columns=False, col_widths=[5, 9, 30],
                   vertical_scroll_only=False, justification="l",
                   font=("None 15"))],
+        
+        #Criar coluna, inserir botões de adicionar e deletar, dar keys a eles.
         [sg.Column([
             [sg.B("Adicionar", size=(20, 2), button_color="#2e689f"),
              sg.B("Deletar", size=(20, 2), button_color="#2e689f",
@@ -178,132 +184,128 @@ def anotações():
     ]
     # =================================================================================================================================================#
     # Info Janela
-    window = sg.Window("Anotações", layout, size=(
+    window = sg.Window("Tarefas", layout, size=(
         600, 400), element_justification=("left"))
-    notas = []
+    
+    #Contadores
+    tarefas = []
     c = 1
+    
+    #Condições
     while True:
         button, values = window.read()
+        
         # Fechar App
-        if button == "Sair" or button == sg.WINDOW_CLOSED:
+        if button == sg.WINDOW_CLOSED:
             window.close()
             break
+        
+        #Botão de Adicionar notas
         elif button == "Adicionar":
-            data = window["-DATA-"].get().split()[0]
-            titulo = values["-NOTA-"]
-            nota = [[c, data, values["-NOTA-"]]]
-            notas += nota
-            window["-TABLE-"].update(notas)
-            window["-NOTA-"].update("")
-            c += 1
-            bc.criar(tipo, data, titulo)
+            titulo = values["-TAREFA-"]  
+            if titulo != "":
+                data = window["-DATA-"].get().split()[0]
+                nota = [[c, data, values["-TAREFA-"]]]
+                tarefas += nota
+                window["-TABLE-"].update(tarefas)
+                window["-TAREFA-"].update("")
+                c += 1
+            else:
+                sg.popup_timed("É necessário inserir uma tarefa",
+                           auto_close_duration=2)
+        
+        #Botão de deletar alguma nota
         elif button == "-DEL-":
             if values["-TABLE-"]:
                 index = values["-TABLE-"][0]
-                del notas[index]
-                window["-TABLE-"].update(notas)
+                del tarefas[index]
+                window["-TABLE-"].update(tarefas)
+        
         # Voltar para pagina anterior
         elif button == "Voltar para página anterior":
             window.close()
             front2()
-    # =================================================================================================================================================#
 
-# Inserindo uma função para a janela lembretes   /:7
-
-
+# Inserindo uma função para a janela lembretes   /:6
 def lembretes():
     # =================================================================================================================================================#
     # Temas
     sg.theme("DarkGrey16")
-
-    # Layout da Interface
+    
+    # Layout Interface
     layout = [
-        [sg.Text("Aqui você marcará os seus lembretes", font=("Arial", 20))],
+        
+        #Botão de Calendário
+        [sg.CalendarButton("Escolher Data", size=(
+            10, 1), button_color="#2e689f"), sg.Text("-- -- -- -- -- --",
+                                                     key="-DATA-")],
+        
+        #Input de nota
+        [sg.T("Escreva seu lembrete:", size=(16, 1)), sg.I(
+            key="-LEMBRETE-", font=("None 15"), size=(40, 1))],
+        
+        #Criar a Tabela com index, data, nota
+        #Headings são os titulos, col_widths são os tamanhos das colunas
+        [sg.Table(values="", headings=["Index", "Data", "Lembretes"],
+                  key="-TABLE-", enable_events=True, size=(500, 10),
+                  auto_size_columns=False, col_widths=[5, 9, 30],
+                  vertical_scroll_only=False, justification="l",
+                  font=("None 15"))],
+        
+        #Criar coluna, inserir botões de adicionar e deletar, dar keys a eles.
         [sg.Column([
-            [sg.Button("Voltar para página anterior", size=(20, 2),
-                       button_color="#2e689f"),
-             sg.Button("Sair", size=(20, 2), button_color="#2e689f")]],
-            element_justification="center", expand_x=True, pad=(0, (220, 0)))],
+            [sg.B("Adicionar", size=(20, 2), button_color="#2e689f"),
+             sg.B("Deletar", size=(20, 2), button_color="#2e689f",
+                  key="-DEL-"), sg.Button("Voltar para página anterior",
+                                          size=(20, 2),
+                                          button_color="#2e689f"), ]],
+            element_justification="center", expand_x=True, pad=(0, (10, 0)))],
     ]
     # =================================================================================================================================================#
-    # Info Janelas
+    # Info Janela
     window = sg.Window("Lembretes", layout, size=(
-        700, 300), element_justification=("center"))
-    button, values = window.read()
-
-    # Fechar App
-    if button == "Sair" or button == sg.WINDOW_CLOSED:
-        exit()
-    window.close()
-
-    # Voltar para página anterior
-    if button == "Voltar para página anterior":
-        front2()
-    # =================================================================================================================================================#
+        600, 400), element_justification=("left"))
+    
+    #Contadores
+    lembretes = []
+    c = 1
+    
+    #Condições
+    while True:
+        button, values = window.read()
+        
+        # Fechar App
+        if button == sg.WINDOW_CLOSED:
+            window.close()
+            break
+        
+        #Botão de Adicionar notas
+        elif button == "Adicionar":
+            titulo = values["-LEMBRETE-"]
+            if titulo != "":
+                data = window["-DATA-"].get().split()[0]
+                nota = [[c, data, values["-LEMBRETE-"]]]
+                lembretes += nota
+                window["-TABLE-"].update(lembretes)
+                window["-LEMBRETE-"].update("")
+                c += 1
+            else:
+                sg.popup_timed("É necessário inserir uma tarefa",
+                           auto_close_duration=2)
+        
+        #Botão de deletar alguma nota
+        elif button == "-DEL-":
+            if values["-TABLE-"]:
+                index = values["-TABLE-"][0]
+                del lembretes[index]
+                window["-TABLE-"].update(lembretes)
+        
+        # Voltar para pagina anterior
+        elif button == "Voltar para página anterior":
+            window.close()
+            front2()
 
 # Página de inicialização do App                 /:1
-
-
-def front():
-    # =================================================================================================================================================#
-    # Inserindo uma lista para definir as características da minha janela
-    # inicial
-    flayout = [
-
-        # Utilizando a função sg.Text para colocar texto na paginal inicial,
-        # aqui eu consigo manipular o texto, tamanho, fonte.
-        [sg.Text("Seja Bem-vindo!", font=("Arial", 13))],
-        [sg.Text("Insira o seu nome", font=("Arial", 13))],
-        [sg.Input(key="-NAME-", size=(20, 2))],
-        # Utilizando a função Column para criar uma coluna na interface
-        # gráfica, ela serve para organizar elementos GUI, como textos, botões,
-        # entradas, etc
-        # Aqui nesse caso, eu queria fazer com que os botões ficassem isolados
-        # na parte inferior da janela por isso usei ela.
-        [sg.Column([
-            # Defini a cor dos botões, o seu nome, e sua cordenada na interface
-
-            [sg.Button("Ver Calendário", button_color="#2e689f"), sg.Button(
-                "Sair do aplicativo", button_color=("#2e689f"))],
-        ], element_justification="center", expand_x=True, pad=(0, (80, 0)))],
-
-    ]
-    # =================================================================================================================================================#
-    # Aqui coloco a variavel window para armazendar a função window que
-    # basicamente é onde eu irei colocar todo o layout de cima dentro de uma
-    # janela.
-    # O layout era basicamente as características de interação com o usuário,
-    # aqui são as características próprias da janela
-    # Defino o nome, insiro o layout feito mais acima, defino o tamanho da
-    # janela, e centralizo o texto no meio.
-    window = sg.Window("Calendary Project App", flayout, size=(
-        500, 200), element_justification="center")
-
-    # Aqui eu defino 2 variáveis, e elas servem basicamente para quantificar
-    # esses botões, ao clica-los por exemplo. A função "window.read()" é para
-    # ler essas variáveis
-    button, values = window.read()
-
-    # Aqui é um bloco de condição onde eu redireciono os meus botões inseridos
-    # anteriormente,
-    # E basicamente ele funciona da seguinte forma, se a função acima ler que
-    # eu cliquei em "Visualizar Calendário", serei redirecionado para a página
-    # main do app.
-    # Entretanto, caso eu clicar no "Sair do Aplicativo", ele fechará o app.
-    # Podem se perguntar pra que esse tal de "sg.WINDOW_CLOSER", ele serve
-    # para fazer com que o X de fechar janelas, que a gnt usa pra fechar tudo,
-    # funcione corretamente.
-
-    if button == "Ver Calendário":
-        window.close()
-        front2()
-    elif button == "Sair do aplicativo" or button == sg.WINDOW_CLOSED:
-        exit()
-    # =================================================================================================================================================#
-
-# Pagina Inicial /  "Página Main                 /:2
-
-
 def front2():
     # =================================================================================================================================================#
     # Setando o tema
@@ -317,9 +319,7 @@ def front2():
         [sg.Button("Eventos", size=(20, 2), button_color=("#2e689f"))],
         [sg.Button("Alarmes", size=(20, 2), button_color=("#2e689f"))],
         [sg.Button("Tarefas", size=(20, 2), button_color=("#2e689f"))],
-        [sg.Button("Anotações", size=(20, 2), button_color=("#2e689f"))],
         [sg.Button("Lembretes", size=(20, 2), button_color=("#2e689f"))],
-        [sg.Button("Sair", size=(20, 2), button_color=("#2e689f"))]
     ]
     # Definindo o layout para chamar a coluna , sg.VerticalSeparator() é para
     # tração uma linha na tela
@@ -330,7 +330,7 @@ def front2():
     # Definindo as características próprias da janela main, titulo, tamanho, e
     # cordenada na interface
     window = sg.Window("Calendário", layout, size=(
-        700, 300), element_justification="left")
+        550, 205), element_justification="left")
 
     # Lendo as variáveis
     button, values = window.read()
@@ -348,14 +348,11 @@ def front2():
         alarmes()
     elif button == "Tarefas":
         tarefas()
-    elif button == "Anotações":
-        anotações()
     elif button == "Lembretes":
         lembretes()
-    elif button == "Sair" or button == sg.WINDOW_CLOSED:
+    elif button == sg.WINDOW_CLOSED:
         exit()
     # =================================================================================================================================================#
 
-
 init()
-# anotações()
+
