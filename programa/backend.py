@@ -5,8 +5,8 @@ import uuid
 def criar(tipo, data, nota):
     conexao = sq.connect("programa/registro.db")
     cursor = conexao.cursor()
-    cursor.execute("INSERT INTO ? (data, nota) VALUES = (?, ?)",
-                   (tipo, data, nota))
+    query = f"INSERT INTO {tipo} (data, titulo) VALUES (?, ?)"
+    cursor.execute(query, (data, nota))
     conexao.commit()
     conexao.close()
 

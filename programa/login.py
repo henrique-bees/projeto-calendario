@@ -166,4 +166,4 @@ def nova_senha():
 
 # nova_senha()
 # login()
-registro()
+# registro()
