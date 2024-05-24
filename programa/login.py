@@ -1,5 +1,4 @@
 import PySimpleGUI as sg
-from time import sleep
 import sqlite3 as sq
 from backend import verificar_senha, criar_sessao
 
@@ -27,10 +26,10 @@ def login():
     event, values = window.read()
     if event == "Voltar":
         window.close()
-        registro()
+        return event
     elif event == "Esqueci minha senha":
         window.close()
-        nova_senha()
+        return event
     elif event == "Ok":
         usuario = values["-NAME-"]
         senha = values["-SENHA-"]
@@ -41,14 +40,17 @@ def login():
         cursor.execute("SELECT nome, senha FROM usuarios WHERE nome = ?",
                        (usuario,))
         busca = cursor.fetchone()
-        criar_sessao(usuario, senha)
+        conexao.close()
         if busca is not None and busca[1] == senha:
             sg.popup_timed("Login efetuado com sucesso",
                            auto_close_duration=2)
+            criar_sessao(usuario, senha)
             window.close()
+            return event
         else:
             sg.popup_timed("Usuário ou senha incorretos",
                            auto_close_duration=2)
+            return False
 
 
 def registro():
@@ -76,20 +78,18 @@ def registro():
     while True:
         event, values = window.read()
         if event == sg.WINDOW_CLOSED or event == "Cancel":
-            break
+            window.close()
+            return False
         elif event == "Já possuo um login":
             window.close()
-            login()
+            return True
         if event == "Ok":
             usuario = values["-NAME-"]
             senha = values["-SENHA-"]
             senha2 = values["-SENHA2-"]
             if senha == senha2:
                 valido = verificar_senha(senha)
-                if valido is True:
-                    window.close()
-                    sg.popup_timed("Registro realizado com sucesso!",
-                                   auto_close=2)
+                if valido:
                     conexao = sq.connect("programa/registro.db")
                     cursor = conexao.cursor()
                     cursor.execute(
@@ -97,17 +97,22 @@ def registro():
                         (usuario, senha))
                     conexao.commit()
                     conexao.close()
-                    login()
+                    window.close()
+                    sg.popup_timed("Registro realizado com sucesso!",
+                                   auto_close=2)
+                    return True
                 else:
                     sg.popup_timed("Senha invalida, as senhas devem possuir "
                                    "pelo menos uma letra maiuscula, uma "
                                    "minuscula, um numero, um caractere "
                                    "especial, e ter entre 8 e 16 caracteres",
                                    auto_close_duration=2)
+                    return False
             else:
                 sg.popup_timed(
                     "As senhas não coincidem, por favor, tente novamente",
                     auto_close_duration=2)
+                return False
 
 
 def nova_senha():
@@ -134,11 +139,10 @@ def nova_senha():
     while True:
         event, values = window.read()
         if event == sg.WINDOW_CLOSED:
-            break
+            return event
         if event == "Voltar":
             window.close()
-            login()
-            break
+            return event
         elif event == "Ok":
             usuario = values["-USUARIO-"]
             senha = values["-SENHA-"]
@@ -156,8 +160,7 @@ def nova_senha():
                     window.close()
                     sg.popup_timed("A nova senha foi cadastrada com sucesso!",
                                    auto_close_duration=2)
-                    sleep(2)
-                    login()
+                    return event
             else:
                 sg.popup_timed(
                     "As senhas não coincidem, por favor, tente novamente",
