@@ -5,8 +5,8 @@ import uuid
 def criar(tipo, data, nota, id):
     conexao = sq.connect("programa/registro.db")
     cursor = conexao.cursor()
-    query = f"INSERT INTO {tipo} (data, titulo) VALUES (?, ?)"
-    cursor.execute(query, (data, nota))
+    query = f"INSERT INTO {tipo} (data, titulo, id_eventos) VALUES (?, ?, ?)"
+    cursor.execute(query, (data, nota, id))
     conexao.commit()
     conexao.close()
 
@@ -30,11 +30,10 @@ def verificar_registro(usuario):
     else:
         conexao = sq.connect("programa/registro.db")
         cursor = conexao.cursor()
-        cursor.execute("SELECT nome FROM usuarios WHERE nome = ?", (usuario))
+        cursor.execute("SELECT nome FROM usuarios WHERE nome = ?", (usuario,))
         busca = cursor.fetchone()
-        print(busca)
         conexao.close()
-        if busca[0] == usuario:
+        if busca is not None:
             return "invalido"
         else:
             return "valido"
@@ -53,8 +52,10 @@ def criar_sessao(nome, senha):
             "INSERT INTO sessions (user_id, session_token) VALUES (?, ?)",
             (id_usuario, token_sessao))
         conexao.commit()
+        conexao.close()
         return token_sessao
     else:
+        conexao.close()
         return None
 
 
@@ -64,4 +65,5 @@ def verificar_sessao(token_sessao):
     cursor.execute("SELECT user_id FROM sessions WHERE session_token = ?",
                    (token_sessao))
     session = cursor.fetchone()
+    conexao.close()
     return session is not None

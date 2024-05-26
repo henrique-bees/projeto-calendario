@@ -38,8 +38,9 @@ def login():
             # Banco de Dados
             conexao = sq.connect("programa/registro.db")
             cursor = conexao.cursor()
-            cursor.execute("SELECT nome, senha FROM usuarios WHERE nome = ?",
-                           (usuario,))
+            cursor.execute(
+                "SELECT nome, senha, id FROM usuarios WHERE nome = ?",
+                (usuario,))
             busca = cursor.fetchone()
             conexao.close()
             if busca is not None and busca[1] == senha:
@@ -47,6 +48,7 @@ def login():
                                auto_close_duration=2)
                 (usuario, senha)
                 window.close()
+                return busca[2]
             else:
                 sg.popup_timed("Usuário ou senha incorretos",
                                auto_close=2)

@@ -46,7 +46,6 @@ def init():
     window.close()
 
 
-
 # Inserindo uma função para a janela eventos     /:3
 
 
@@ -112,7 +111,7 @@ def eventos():
                 window["-TABLE-"].update(eventos)
                 window["-EVENTO-"].update("")
                 c += 1
-                bc.criar(tipo, data, titulo)
+                bc.criar(tipo, data, titulo, id)
             else:
                 sg.popup_timed("É necessário inserir uma tarefa",
                                auto_close_duration=2)
@@ -379,4 +378,5 @@ def front2():
     # =================================================================================================================================================#
 
 
+id = ln.login()
 init()
