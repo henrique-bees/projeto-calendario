@@ -26,10 +26,10 @@ def login():
     event, values = window.read()
     if event == "Voltar":
         window.close()
-        return event
+        registro()
     elif event == "Esqueci minha senha":
         window.close()
-        return event
+        nova_senha()
     elif event == "Ok":
         usuario = values["-NAME-"]
         senha = values["-SENHA-"]
@@ -44,13 +44,12 @@ def login():
         if busca is not None and busca[1] == senha:
             sg.popup_timed("Login efetuado com sucesso",
                            auto_close_duration=2)
-            criar_sessao(usuario, senha)
+            codigo_sessao = criar_sessao(usuario, senha)
             window.close()
-            return event
+            return codigo_sessao
         else:
             sg.popup_timed("Usuário ou senha incorretos",
                            auto_close_duration=2)
-            return False
 
 
 def registro():
@@ -78,16 +77,15 @@ def registro():
     while True:
         event, values = window.read()
         if event == sg.WINDOW_CLOSED or event == "Cancel":
-            window.close()
-            return False
+            quit()
         elif event == "Já possuo um login":
             window.close()
-            return True
+            login()
         if event == "Ok":
-            usuario = values["-NAME-"]
+            usuario = values["-NAME-"].strip()
             senha = values["-SENHA-"]
             senha2 = values["-SENHA2-"]
-            if senha == senha2:
+            if senha == senha2 and usuario != "":
                 valido = verificar_senha(senha)
                 if valido:
                     conexao = sq.connect("programa/registro.db")
@@ -100,19 +98,18 @@ def registro():
                     window.close()
                     sg.popup_timed("Registro realizado com sucesso!",
                                    auto_close=2)
-                    return True
+                    login()
                 else:
                     sg.popup_timed("Senha invalida, as senhas devem possuir "
                                    "pelo menos uma letra maiuscula, uma "
                                    "minuscula, um numero, um caractere "
                                    "especial, e ter entre 8 e 16 caracteres",
                                    auto_close_duration=2)
-                    return False
             else:
                 sg.popup_timed(
-                    "As senhas não coincidem, por favor, tente novamente",
+                    "As senhas não coincidem ou o usuário é vazio, por favor"
+                    ", tente novamente",
                     auto_close_duration=2)
-                return False
 
 
 def nova_senha():
@@ -139,15 +136,15 @@ def nova_senha():
     while True:
         event, values = window.read()
         if event == sg.WINDOW_CLOSED:
-            return event
+            quit()
         if event == "Voltar":
             window.close()
-            return event
+            login()
         elif event == "Ok":
-            usuario = values["-USUARIO-"]
+            usuario = values["-USUARIO-"].strip()
             senha = values["-SENHA-"]
             senha2 = values["-SENHA2-"]
-            if senha == senha2:
+            if senha == senha2 and usuario != "":
                 valido = verificar_senha(senha)
                 if valido:
                     conexao = sq.connect("programa/registro.db")
@@ -160,13 +157,14 @@ def nova_senha():
                     window.close()
                     sg.popup_timed("A nova senha foi cadastrada com sucesso!",
                                    auto_close_duration=2)
-                    return event
+                    login()
             else:
                 sg.popup_timed(
-                    "As senhas não coincidem, por favor, tente novamente",
+                    "As senhas não coincidem ou o usuário é vazio, por favor,"
+                    " tente novamente",
                     auto_close_duration=2)
 
 
 # nova_senha()
 # login()
-# registro()
+registro()

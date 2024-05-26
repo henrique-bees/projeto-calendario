@@ -44,27 +44,7 @@ def init():
         # para refletir o progresso atual.
         window["-PROG-"].UpdateBar(i+1)
     window.close()
-    while True:
-        verificador_registro = ln.registro()
-        if verificador_registro:
-            verificador_login = ln.login()
-            while True:
-                if verificador_login == "Ok":
-                    front2()
-                    break
-                elif verificador_login == "Voltar":
-                    break
-                elif verificador_login == "Esqueci minha senha":
-                    verificador_redefinição = ln.nova_senha()
-                    while True:
-                        if verificador_redefinição == "Ok":
-                            break
-                        elif verificador_redefinição == sg.WINDOW_CLOSED:
-                            quit()
-                        elif verificador_redefinição == "Voltar":
-                            break
-        else:
-            quit()
+
 
 
 # Inserindo uma função para a janela eventos     /:3
