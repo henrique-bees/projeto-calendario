@@ -1,6 +1,6 @@
 import PySimpleGUI as sg
 import sqlite3 as sq
-from backend import verificar_senha, criar_sessao
+from backend import verificar_senha, verificar_registro
 
 
 def login():
@@ -23,33 +23,33 @@ def login():
     ]
     window = sg.Window("Login", layout, size=(400, 160))
 
-    event, values = window.read()
-    if event == "Voltar":
-        window.close()
-        registro()
-    elif event == "Esqueci minha senha":
-        window.close()
-        nova_senha()
-    elif event == "Ok":
-        usuario = values["-NAME-"]
-        senha = values["-SENHA-"]
-
-        # Banco de Dados
-        conexao = sq.connect("programa/registro.db")
-        cursor = conexao.cursor()
-        cursor.execute("SELECT nome, senha FROM usuarios WHERE nome = ?",
-                       (usuario,))
-        busca = cursor.fetchone()
-        conexao.close()
-        if busca is not None and busca[1] == senha:
-            sg.popup_timed("Login efetuado com sucesso",
-                           auto_close_duration=2)
-            codigo_sessao = criar_sessao(usuario, senha)
+    while True:
+        event, values = window.read()
+        if event == "Voltar":
             window.close()
-            return codigo_sessao
-        else:
-            sg.popup_timed("Usuário ou senha incorretos",
-                           auto_close_duration=2)
+            registro()
+        elif event == "Esqueci minha senha":
+            window.close()
+            nova_senha()
+        elif event == "Ok":
+            usuario = values["-NAME-"]
+            senha = values["-SENHA-"]
+
+            # Banco de Dados
+            conexao = sq.connect("programa/registro.db")
+            cursor = conexao.cursor()
+            cursor.execute("SELECT nome, senha FROM usuarios WHERE nome = ?",
+                           (usuario,))
+            busca = cursor.fetchone()
+            conexao.close()
+            if busca is not None and busca[1] == senha:
+                sg.popup_timed("Login efetuado com sucesso",
+                               auto_close_duration=2)
+                (usuario, senha)
+                window.close()
+            else:
+                sg.popup_timed("Usuário ou senha incorretos",
+                               auto_close=2)
 
 
 def registro():
@@ -85,31 +85,42 @@ def registro():
             usuario = values["-NAME-"].strip()
             senha = values["-SENHA-"]
             senha2 = values["-SENHA2-"]
-            if senha == senha2 and usuario != "":
-                valido = verificar_senha(senha)
-                if valido:
-                    conexao = sq.connect("programa/registro.db")
-                    cursor = conexao.cursor()
-                    cursor.execute(
-                        "INSERT INTO usuarios (nome, senha) VALUES (?, ?)",
-                        (usuario, senha))
-                    conexao.commit()
-                    conexao.close()
-                    window.close()
-                    sg.popup_timed("Registro realizado com sucesso!",
-                                   auto_close=2)
-                    login()
-                else:
-                    sg.popup_timed("Senha invalida, as senhas devem possuir "
-                                   "pelo menos uma letra maiuscula, uma "
-                                   "minuscula, um numero, um caractere "
-                                   "especial, e ter entre 8 e 16 caracteres",
-                                   auto_close_duration=2)
-            else:
+            massa = verificar_registro(usuario)
+            if massa == "vazio":
                 sg.popup_timed(
-                    "As senhas não coincidem ou o usuário é vazio, por favor"
-                    ", tente novamente",
-                    auto_close_duration=2)
+                    "O usuário precisa estar preenchido", auto_close_duration=2
+                )
+            elif massa == "invalido":
+                sg.popup_timed(
+                    "Usuário já foi cadastrado", auto_close_duration=2
+                )
+            elif massa == "valido":
+                if senha == senha2:
+                    valido = verificar_senha(senha)
+                    if valido:
+                        conexao = sq.connect("programa/registro.db")
+                        cursor = conexao.cursor()
+                        cursor.execute(
+                            "INSERT INTO usuarios (nome, senha) VALUES (?, ?)",
+                            (usuario, senha))
+                        conexao.commit()
+                        conexao.close()
+                        window.close()
+                        sg.popup_timed("Registro realizado com sucesso!",
+                                       auto_close=2)
+                        login()
+                    else:
+                        sg.popup_timed(
+                            "Senha invalida, as senhas devem possuir "
+                            "pelo menos uma letra maiuscula, uma "
+                            "minuscula, um numero, um caractere "
+                            "especial, e ter entre 8 e 16 caracteres",
+                            auto_close_duration=2)
+                else:
+                    sg.popup_timed(
+                        "As senhas não coincidem ou o usuário é vazio,"
+                        " por favor, tente novamente",
+                        auto_close_duration=2)
 
 
 def nova_senha():

@@ -2,7 +2,7 @@ import sqlite3 as sq
 import uuid
 
 
-def criar(tipo, data, nota):
+def criar(tipo, data, nota, id):
     conexao = sq.connect("programa/registro.db")
     cursor = conexao.cursor()
     query = f"INSERT INTO {tipo} (data, titulo) VALUES (?, ?)"
@@ -22,6 +22,22 @@ def verificar_senha(senha):
             return True
     else:
         return False
+
+
+def verificar_registro(usuario):
+    if usuario == "":
+        return "vazio"
+    else:
+        conexao = sq.connect("programa/registro.db")
+        cursor = conexao.cursor()
+        cursor.execute("SELECT nome FROM usuarios WHERE nome = ?", (usuario))
+        busca = cursor.fetchone()
+        print(busca)
+        conexao.close()
+        if busca[0] == usuario:
+            return "invalido"
+        else:
+            return "valido"
 
 
 def criar_sessao(nome, senha):
