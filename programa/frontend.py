@@ -567,6 +567,6 @@ def front2():
 icon = icon()
 sg.set_global_icon(icon)
 
-perfil()
+front2()
 id = login()
 
