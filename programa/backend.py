@@ -1,5 +1,4 @@
 import sqlite3 as sq
-import uuid
 
 
 def criar(tipo, data, nota, id):
@@ -7,6 +6,15 @@ def criar(tipo, data, nota, id):
     cursor = conexao.cursor()
     query = f"INSERT INTO {tipo} (data, titulo, id_eventos) VALUES (?, ?, ?)"
     cursor.execute(query, (data, nota, id))
+    conexao.commit()
+    conexao.close()
+
+
+def deletar(tipo, id):
+    conexao = sq.connect("programa/registro.db")
+    cursor = conexao.cursor()
+    query = f"DELETE FROM {tipo} WHERE id = ?"
+    cursor.execute(query, (id))
     conexao.commit()
     conexao.close()
 
@@ -37,33 +45,3 @@ def verificar_registro(usuario):
             return "invalido"
         else:
             return "valido"
-
-
-def criar_sessao(nome, senha):
-    conexao = sq.connect("programa/registro.db")
-    cursor = conexao.cursor()
-    cursor.execute("SELECT id FROM usuarios WHERE nome = ? AND senha = ?",
-                   (nome, senha))
-    usuario = cursor.fetchone()
-    if usuario:
-        id_usuario = usuario[0]
-        token_sessao = str(uuid.uuid4())
-        cursor.execute(
-            "INSERT INTO sessions (user_id, session_token) VALUES (?, ?)",
-            (id_usuario, token_sessao))
-        conexao.commit()
-        conexao.close()
-        return token_sessao
-    else:
-        conexao.close()
-        return None
-
-
-def verificar_sessao(token_sessao):
-    conexao = sq.connect("programa/registro.db")
-    cursor = conexao.cursor()
-    cursor.execute("SELECT user_id FROM sessions WHERE session_token = ?",
-                   (token_sessao))
-    session = cursor.fetchone()
-    conexao.close()
-    return session is not None
