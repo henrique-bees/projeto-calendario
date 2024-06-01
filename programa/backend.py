@@ -1,11 +1,11 @@
 import sqlite3 as sq
 
 
-def criar(tipo, data, nota, id):
+def criar(tipo, data, titulo, id):
     conexao = sq.connect("programa/registro.db")
     cursor = conexao.cursor()
     query = f"INSERT INTO {tipo} (data, titulo, id_eventos) VALUES (?, ?, ?)"
-    cursor.execute(query, (data, nota, id))
+    cursor.execute(query, (data, titulo, id))
     conexao.commit()
     conexao.close()
 
@@ -13,10 +13,20 @@ def criar(tipo, data, nota, id):
 def deletar(tipo, id):
     conexao = sq.connect("programa/registro.db")
     cursor = conexao.cursor()
-    query = f"DELETE FROM {tipo} WHERE id = ?"
+    query = "DELETE FROM eventos WHERE id = ?"
     cursor.execute(query, (id))
     conexao.commit()
     conexao.close()
+
+
+def ler_salvos(tipo, id):
+    conexao = sq.connect("programa/registro.db")
+    cursor = conexao.cursor()
+    query = f"SELECT * FROM {tipo} where id_eventos = ?"
+    cursor.execute(query, (id,))
+    conteudo = cursor.fetchall()
+    conexao.close()
+    return conteudo
 
 
 def verificar_senha(senha):
