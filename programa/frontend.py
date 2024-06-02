@@ -1,7 +1,8 @@
 import backend as bc
 import PySimpleGUI as sg
 import sqlite3 as sq
-
+import time
+import threading
 
 # Importando biblioteca PySimpleGUI para o front-end
 # Importando biblioteca calendario para um possível acréscimo no futuro
@@ -227,7 +228,7 @@ def eventos():
 
         # Botão de Calendário
         [sg.CalendarButton("Escolher Data", size=(
-            10, 1), button_color="#2e689f"), sg.Text("-- -- -- -- -- --",
+            10, 1), button_color="#4169E1"), sg.Text("-- -- -- -- -- --",
                                                      key="-DATA-")],
         # Input de nota
         [sg.T("Insira o seu evento:", size=(16, 1)), sg.I(
@@ -243,11 +244,11 @@ def eventos():
 
         # Criar coluna, inserir botões de adicionar e deletar, dar keys a eles.
         [sg.Column([
-            [sg.B("Adicionar", size=(20, 2), button_color="#2e689f"),
-             sg.B("Deletar", size=(20, 2), button_color="#2e689f",
+            [sg.B("Adicionar", size=(20, 2), button_color="#4169E1"),
+             sg.B("Deletar", size=(20, 2), button_color="#4169E1",
                   key="-DEL-"), sg.Button("Voltar para página anterior",
                                           size=(20, 2),
-                                          button_color="#2e689f"), ]],
+                                          button_color="#4169E1"), ]],
             element_justification="center", expand_x=True, pad=(0, (10, 0)))],
     ]
     # =================================================================================================================================================#
@@ -300,7 +301,7 @@ def eventos():
 
 # Inserindo uma função para a janela alarmes     /:3
 def alarmes():
-    # =================================================================================================================================================#
+     # =================================================================================================================================================#
     # Tema
     sg.theme("DarkGrey16")
 
@@ -309,8 +310,8 @@ def alarmes():
         [sg.Text("Aqui você marcará os seus alarmes", font=("Arial", 20))],
         [sg.Column([
             [sg.Button("Voltar para página anterior", size=(20, 2),
-                       button_color="#2e689f"),
-             sg.Button("Sair", size=(20, 2), button_color="#2e689f")]
+                       button_color="#4169E1"),
+             sg.Button("Sair", size=(20, 2), button_color="#4169E1")]
         ], element_justification="center", expand_x=True, pad=(0, (220, 0)))],
     ]
     # =================================================================================================================================================#
@@ -338,7 +339,7 @@ def tarefas():
 
         # Botão de Calendário
         [sg.CalendarButton("Escolher Data", size=(
-            10, 1), button_color="#2e689f"), sg.Text("-- -- -- -- -- --",
+            10, 1), button_color="#4169E1"), sg.Text("-- -- -- -- -- --",
                                                      key="-DATA-")],
         # Input de nota
         [sg.T("Insira a sua tarefa:", size=(16, 1)), sg.I(
@@ -354,11 +355,11 @@ def tarefas():
 
         # Criar coluna, inserir botões de adicionar e deletar, dar keys a eles.
         [sg.Column([
-            [sg.B("Adicionar", size=(20, 2), button_color="#2e689f"),
-             sg.B("Deletar", size=(20, 2), button_color="#2e689f",
+            [sg.B("Adicionar", size=(20, 2), button_color="#4169E1"),
+             sg.B("Deletar", size=(20, 2), button_color="#4169E1",
                   key="-DEL-"), sg.Button("Voltar para página anterior",
                                           size=(20, 2),
-                                          button_color="#2e689f"), ]],
+                                          button_color="#4169E1"), ]],
             element_justification="center", expand_x=True, pad=(0, (10, 0)))],
     ]
     # =================================================================================================================================================#
@@ -416,7 +417,7 @@ def lembretes():
 
         # Botão de Calendário
         [sg.CalendarButton("Escolher Data", size=(
-            10, 1), button_color="#2e689f"), sg.Text("-- -- -- -- -- --",
+            10, 1), button_color="#4169E1"), sg.Text("-- -- -- -- -- --",
                                                      key="-DATA-")],
 
         # Input de nota
@@ -433,11 +434,11 @@ def lembretes():
 
         # Criar coluna, inserir botões de adicionar e deletar, dar keys a eles.
         [sg.Column([
-            [sg.B("Adicionar", size=(20, 2), button_color="#2e689f"),
-             sg.B("Deletar", size=(20, 2), button_color="#2e689f",
+            [sg.B("Adicionar", size=(20, 2), button_color="#4169E1"),
+             sg.B("Deletar", size=(20, 2), button_color="#4169E1",
                   key="-DEL-"), sg.Button("Voltar para página anterior",
                                           size=(20, 2),
-                                          button_color="#2e689f"), ]],
+                                          button_color="#4169E1"), ]],
             element_justification="center", expand_x=True, pad=(0, (10, 0)))],
     ]
     # =================================================================================================================================================#
@@ -495,7 +496,9 @@ def editar_perfil():
         [sg.Text("Telefone: ", size=(10, 1)), sg.Input(key="-TELEFONE-",font=("None 15"), size=(30, 1))],
         [sg.Text("Idade: ", size=(10, 1)), sg.Input(key="-IDADE-",font=("None 15"), size=(30, 1))],
         [sg.Text("Gênero: ", size=(10, 1)), sg.Input(key="-GENERO-",font=("None 15"), size=(30, 1))],
-        [sg.Button("Salvar alterações"), sg.Button("Voltar para página anterior")]
+        [sg.HorizontalSeparator()],
+        [sg.Button("Salvar alterações", size=(15, 2), button_color="#4169E1", pad=(30, 1)), 
+         sg.Button("Visualizar Perfil", size=(15, 2), button_color="#4169E1", pad=(15, 1))]
     ]
 
     # Frame que contém as informações do usuário
@@ -505,43 +508,98 @@ def editar_perfil():
     layout = [
         [frame],
     ]
-    window = sg.Window("Editar Perfil", layout, size=(400, 270))
+    window = sg.Window("Editar Perfil", layout, size=(400, 276))
     button, values = window.read()
     window.close()
 
-    if button == "Sair da conta":
-        window.close()
-        registro()
-    elif button == sg.WINDOW_CLOSED:
+    
+    if button == sg.WINDOW_CLOSED:
         exit()
+    elif button == "Visualizar Perfil":
+        window.close()
+        perfil()
+    elif button == "Salvar alterações":
+        ""
 
 def perfil():
     sg.theme("DarkGrey16")
 
     frame_layout = [
-
+        [sg.Text("Usuário: ", size=(10, 1)), sg.Input(key="-USUARIO-",font=("None 15"), size=(30, 1))],
+        [sg.Text("Nome: ", size=(10, 1)), sg.Input(key="-NOME-",font=("None 15"), size=(30, 1))],
+        [sg.Text("Email: ", size=(10, 1)), sg.Input(key="-EMAIL-",font=("None 15"), size=(30, 1))],
+        [sg.Text("Telefone: ", size=(10, 1)), sg.Input(key="-TELEFONE-",font=("None 15"), size=(30, 1))],
+        [sg.Text("Idade: ", size=(10, 1)), sg.Input(key="-IDADE-",font=("None 15"), size=(30, 1))],
+        [sg.Text("Gênero: ", size=(10, 1)), sg.Input(key="-GENERO-",font=("None 15"), size=(30, 1))],
+        [sg.HorizontalSeparator()],
+        [sg.Button("Sair da conta", size=(10, 2), button_color="#4169E1", pad=(16, 1)), 
+         sg.Button("Editar Perfil", size=(10, 2), button_color="#4169E1", pad=(16, 1)), 
+         sg.Button("Voltar", size=(10, 2), button_color="#4169E1", pad=(16, 1))]
 
     ]
     frame = sg.Frame("Informações do Usuário", frame_layout, size=(400, 300))
 
     layout = [
-
+        [frame]
     ]
+    window = sg.Window("Perfil", layout, size=(400, 276))
+    event, values = window.read()
+
+    if event == sg.WINDOW_CLOSED:
+        exit()
+    elif event == "Sair da conta":
+        window.close()
+        login()
+    elif event == "Editar Perfil":
+        window.close()
+        editar_perfil()
+    elif event == "Voltar":
+        window.close()
+        front2()
+
+    
+def verificação():
+    sg.theme("Darkgrey16")
+    frame_layout = [
+        [sg.Text("Usuário:", size=(7, 1)), sg.Input(key="-USUARIO-")],
+        [sg.HorizontalSeparator()],
+        [sg.Text("Senha:", size=(7, 1)), sg.Input(key="-SENHA-")],
+        
+        [sg.Button("Ok"), sg.Button("Cancel")],
+        
+    ]
+    
+    
+    layout = [
+        [sg.Frame(None, frame_layout)],
+    ]
+    window = sg.Window("Verificação", layout, size=(300, 115))
+    event, values = window.read()
+    if event == sg.WINDOW_CLOSED:
+        exit()
+    elif event == "Ok":
+        window.close()
+        sg.popup("Informações modificadas com sucesso")
+        perfil()
+    elif event == "Cancel":
+        sg.popup("Tentativa de edição mal sucedida")
+        window.close()
+        front2()
 # Página de inicialização do App                 /:1
 def front2():
     sg.theme("DarkGrey16")
 
     # Layout dos botões dentro do frame interno
     buttons_layout = [
-        [sg.Button("Eventos", size=(10, 2), button_color=("#2e689f"),
+        [sg.Button("Eventos", size=(10, 2), button_color=("#4169E1"),
                    pad=(1, 1)),
          sg.Button("Alarmes", size=(10, 2),
-                   button_color=("#2e689f"), pad=(1, 1)),
+                   button_color=("#4169E1"), pad=(1, 1)),
          sg.Button("Tarefas", size=(10, 2),
-                   button_color=("#2e689f"), pad=(1, 1)),
+                   button_color=("#4169E1"), pad=(1, 1)),
          sg.Button("Lembretes", size=(10, 2),
-                   button_color=("#2e689f"), pad=(1, 1)),
-         sg.Button("Perfil", size=(10, 2), button_color=("#2e689f"),
+                   button_color=("#4169E1"), pad=(1, 1)),
+         sg.Button("Perfil", size=(10, 2), button_color=("#4169E1"),
                    pad=(1, 1))],
     ]
 
@@ -581,9 +639,8 @@ def front2():
     elif button == sg.WINDOW_CLOSED:
         exit()
 
-editar_perfil()
 # ICON PARA O APP
 icon = icon()
 sg.set_global_icon(icon)
-
-id = login()
+#id = login()
+front2()
