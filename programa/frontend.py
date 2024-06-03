@@ -226,8 +226,6 @@ def init():
     registro()
 
 
-id = login()
-print(id)
 # Inserindo uma função para a janela eventos     /:2
 
 
@@ -270,9 +268,26 @@ def eventos():
 
     # Contadores
     tipo = "eventos"
+    eventos = []
+    print(eventos, "primeiro print de eventos")
     conteudo = bc.ler_salvos(tipo, id)
-    print(conteudo)
-    eventos = [conteudo]
+    print(len(conteudo), "tamanho de conteudo")
+    print(conteudo, "primeiro print de conteudo")
+    for j in range(len(conteudo)):
+        eventos.append([])
+        print(eventos, "j")
+        print(j)
+        for i in conteudo:
+            eventos[j].append(i)
+            print(i, "print elementos do for")
+"""
+essa parte do codigo nao funciona da forma que era pra funcionar
+eu nao consigo pensar em nenhuma solução ent vou dormir se vc estiver lendo
+isso saiba que amanha eu arrumo chama fio é os guri
+"""
+
+    # eventos.update(conteudo.split())
+    print(eventos, "segundo print de eventos")
     c = 1
 
     # Condições
@@ -292,6 +307,7 @@ def eventos():
                 titulo = values["-EVENTO-"]
                 nota = [[c, data, values["-EVENTO-"]]]
                 eventos += nota
+                print(eventos, "terceiro print de eventos")
                 window["-TABLE-"].update(eventos)
                 window["-EVENTO-"].update("")
                 c += 1
@@ -317,7 +333,7 @@ def eventos():
 
 
 def alarmes():
-     # =================================================================================================================================================#
+    # =================================================================================================================================================#
     # Tema
     sg.theme("DarkGrey16")
 
@@ -512,14 +528,20 @@ def editar_perfil():
     sg.theme("DarkGrey16")
 
     frame_layout = [
-        [sg.Text("Usuário: ", size=(10, 1)), sg.Input(key="-USUARIO-",font=("None 15"), size=(30, 1))],
-        [sg.Text("Nome: ", size=(10, 1)), sg.Input(key="-NOME-",font=("None 15"), size=(30, 1))],
-        [sg.Text("Email: ", size=(10, 1)), sg.Input(key="-EMAIL-",font=("None 15"), size=(30, 1))],
-        [sg.Text("Telefone: ", size=(10, 1)), sg.Input(key="-TELEFONE-",font=("None 15"), size=(30, 1))],
-        [sg.Text("Idade: ", size=(10, 1)), sg.Input(key="-IDADE-",font=("None 15"), size=(30, 1))],
-        [sg.Text("Gênero: ", size=(10, 1)), sg.Input(key="-GENERO-",font=("None 15"), size=(30, 1))],
+        [sg.Text("Usuário: ", size=(10, 1)), sg.Input(
+            key="-USUARIO-", font=("None 15"), size=(30, 1))],
+        [sg.Text("Nome: ", size=(10, 1)), sg.Input(
+            key="-NOME-", font=("None 15"), size=(30, 1))],
+        [sg.Text("Email: ", size=(10, 1)), sg.Input(
+            key="-EMAIL-", font=("None 15"), size=(30, 1))],
+        [sg.Text("Telefone: ", size=(10, 1)), sg.Input(
+            key="-TELEFONE-", font=("None 15"), size=(30, 1))],
+        [sg.Text("Idade: ", size=(10, 1)), sg.Input(
+            key="-IDADE-", font=("None 15"), size=(30, 1))],
+        [sg.Text("Gênero: ", size=(10, 1)), sg.Input(
+            key="-GENERO-", font=("None 15"), size=(30, 1))],
         [sg.HorizontalSeparator()],
-        [sg.Button("Salvar alterações", size=(15, 2), button_color="#4169E1", pad=(30, 1)), 
+        [sg.Button("Salvar alterações", size=(15, 2), button_color="#4169E1", pad=(30, 1)),
          sg.Button("Visualizar Perfil", size=(15, 2), button_color="#4169E1", pad=(15, 1))]
     ]
 
@@ -534,7 +556,6 @@ def editar_perfil():
     button, values = window.read()
     window.close()
 
-    
     if button == sg.WINDOW_CLOSED:
         exit()
     elif button == "Visualizar Perfil":
@@ -548,15 +569,22 @@ def perfil():
     sg.theme("DarkGrey16")
 
     frame_layout = [
-        [sg.Text("Usuário: ", size=(10, 1)), sg.Input(key="-USUARIO-",font=("None 15"), size=(30, 1))],
-        [sg.Text("Nome: ", size=(10, 1)), sg.Input(key="-NOME-",font=("None 15"), size=(30, 1))],
-        [sg.Text("Email: ", size=(10, 1)), sg.Input(key="-EMAIL-",font=("None 15"), size=(30, 1))],
-        [sg.Text("Telefone: ", size=(10, 1)), sg.Input(key="-TELEFONE-",font=("None 15"), size=(30, 1))],
-        [sg.Text("Idade: ", size=(10, 1)), sg.Input(key="-IDADE-",font=("None 15"), size=(30, 1))],
-        [sg.Text("Gênero: ", size=(10, 1)), sg.Input(key="-GENERO-",font=("None 15"), size=(30, 1))],
+        [sg.Text("Usuário: ", size=(10, 1)), sg.Input(
+            key="-USUARIO-", font=("None 15"), size=(30, 1))],
+        [sg.Text("Nome: ", size=(10, 1)), sg.Input(
+            key="-NOME-", font=("None 15"), size=(30, 1))],
+        [sg.Text("Email: ", size=(10, 1)), sg.Input(
+            key="-EMAIL-", font=("None 15"), size=(30, 1))],
+        [sg.Text("Telefone: ", size=(10, 1)), sg.Input(
+            key="-TELEFONE-", font=("None 15"), size=(30, 1))],
+        [sg.Text("Idade: ", size=(10, 1)), sg.Input(
+            key="-IDADE-", font=("None 15"), size=(30, 1))],
+        [sg.Text("Gênero: ", size=(10, 1)), sg.Input(
+            key="-GENERO-", font=("None 15"), size=(30, 1))],
         [sg.HorizontalSeparator()],
-        [sg.Button("Sair da conta", size=(10, 2), button_color="#4169E1", pad=(16, 1)), 
-         sg.Button("Editar Perfil", size=(10, 2), button_color="#4169E1", pad=(16, 1)), 
+        [sg.Button("Sair da conta", size=(10, 2), button_color="#4169E1", pad=(16, 1)),
+         sg.Button("Editar Perfil", size=(10, 2),
+                   button_color="#4169E1", pad=(16, 1)),
          sg.Button("Voltar", size=(10, 2), button_color="#4169E1", pad=(16, 1))]
 
     ]
@@ -580,19 +608,18 @@ def perfil():
         window.close()
         front2()
 
-    
+
 def verificação():
     sg.theme("Darkgrey16")
     frame_layout = [
         [sg.Text("Usuário:", size=(7, 1)), sg.Input(key="-USUARIO-")],
         [sg.HorizontalSeparator()],
         [sg.Text("Senha:", size=(7, 1)), sg.Input(key="-SENHA-")],
-        
+
         [sg.Button("Ok"), sg.Button("Cancel")],
-        
+
     ]
-    
-    
+
     layout = [
         [sg.Frame(None, frame_layout)],
     ]
@@ -665,7 +692,10 @@ def front2():
         exit()
 
 
-front2()
 # ICON PARA O APP
 icon = icon()
 sg.set_global_icon(icon)
+
+id = login()
+print(id)
+front2()
