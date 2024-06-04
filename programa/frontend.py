@@ -234,6 +234,8 @@ def eventos():
     # Temas
     sg.theme("DarkGrey16")
     # Layout Interface
+    tipo = "eventos"
+    conteudo = bc.ler_salvos(tipo, id)
     layout = [
 
         # Botão de Calendário
@@ -246,7 +248,7 @@ def eventos():
 
         # Criar a Tabela com index, data, nota
         # Headings são os titulos, col_widths são os tamanhos das colunas
-        [sg.Table(values="", headings=["Index", "Data", "Evento"],
+        [sg.Table(values=conteudo, headings=["Index", "Data", "Evento"],
                   key="-TABLE-", enable_events=True, size=(500, 10),
                   auto_size_columns=False, col_widths=[5, 9, 30],
                   vertical_scroll_only=False, justification="l",
@@ -267,28 +269,8 @@ def eventos():
         600, 400), element_justification=("left"))
 
     # Contadores
-    tipo = "eventos"
     eventos = []
-    print(eventos, "primeiro print de eventos")
-    conteudo = bc.ler_salvos(tipo, id)
-    print(len(conteudo), "tamanho de conteudo")
-    print(conteudo, "primeiro print de conteudo")
-    for j in range(len(conteudo)):
-        eventos.append([])
-        print(eventos, "j")
-        print(j)
-        for i in conteudo:
-            eventos[j].append(i)
-            print(i, "print elementos do for")
-"""
-essa parte do codigo nao funciona da forma que era pra funcionar
-eu nao consigo pensar em nenhuma solução ent vou dormir se vc estiver lendo
-isso saiba que amanha eu arrumo chama fio é os guri
-"""
-
-    # eventos.update(conteudo.split())
-    print(eventos, "segundo print de eventos")
-    c = 1
+    c = bc.atualizar_index(tipo, id) + 1
 
     # Condições
     while True:
@@ -306,9 +288,8 @@ isso saiba que amanha eu arrumo chama fio é os guri
                 data = window["-DATA-"].get().split()[0]
                 titulo = values["-EVENTO-"]
                 nota = [[c, data, values["-EVENTO-"]]]
-                eventos += nota
-                print(eventos, "terceiro print de eventos")
-                window["-TABLE-"].update(eventos)
+                conteudo += nota
+                window["-TABLE-"].update(conteudo)
                 window["-EVENTO-"].update("")
                 c += 1
                 bc.criar(tipo, data, titulo, id)
@@ -697,5 +678,4 @@ icon = icon()
 sg.set_global_icon(icon)
 
 id = login()
-print(id)
 front2()

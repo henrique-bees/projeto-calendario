@@ -13,7 +13,7 @@ def criar(tipo, data, titulo, id):
 def deletar(tipo, id):
     conexao = sq.connect("programa/registro.db")
     cursor = conexao.cursor()
-    query = "DELETE FROM eventos WHERE id = ?"
+    query = f"DELETE FROM {tipo} WHERE id = ?"
     cursor.execute(query, (id))
     conexao.commit()
     conexao.close()
@@ -22,11 +22,21 @@ def deletar(tipo, id):
 def ler_salvos(tipo, id):
     conexao = sq.connect("programa/registro.db")
     cursor = conexao.cursor()
-    query = f"SELECT * FROM {tipo} where id_eventos = ?"
+    query = f"SELECT * FROM {tipo} WHERE id_eventos = ?"
     cursor.execute(query, (id,))
     conteudo = cursor.fetchall()
     conexao.close()
     return conteudo
+
+
+def atualizar_index(tipo, id):
+    conexao = sq.connect("programa/registro.db")
+    cursor = conexao.cursor()
+    query = f"SELECT id FROM {tipo} WHERE id_eventos = ?"
+    cursor.execute(query, (id,))
+    id_atualizado = cursor.fetchall()
+    conexao.close()
+    return id_atualizado[-1][0]
 
 
 def verificar_senha(senha):
