@@ -60,7 +60,9 @@ def login():
                                auto_close_duration=2)
                 (usuario, senha)
                 window.close()
-                return busca[2]
+                global id
+                id = busca[2]
+                front2()
             else:
                 sg.popup_timed("Usuário ou senha incorretos",
                                auto_close=2)
@@ -96,7 +98,9 @@ def registro():
             quit()
         elif event == "Já possuo um login":
             window.close()
-            login()
+            global id
+            id = login()
+            break
         if event == "Ok":
             usuario = values["-NAME-"].strip()
             senha = values["-SENHA-"]
@@ -124,7 +128,7 @@ def registro():
                         window.close()
                         sg.popup_timed("Registro realizado com sucesso!",
                                        auto_close=2)
-                        login()
+                        id = login()
                     else:
                         sg.popup_timed(
                             "Senha invalida, as senhas devem possuir "
@@ -168,7 +172,8 @@ def nova_senha():
             quit()
         if event == "Voltar":
             window.close()
-            login()
+            global id
+            id = login()
         elif event == "Ok":
             usuario = values["-USUARIO-"].strip()
             senha = values["-SENHA-"]
@@ -186,7 +191,7 @@ def nova_senha():
                     window.close()
                     sg.popup_timed("A nova senha foi cadastrada com sucesso!",
                                    auto_close_duration=2)
-                    login()
+                    id = login()
             else:
                 sg.popup_timed(
                     "As senhas não coincidem ou o usuário é vazio, por favor,"
@@ -525,8 +530,10 @@ def editar_perfil():
         [sg.Text("Gênero: ", size=(10, 1)), sg.Input(
             key="-GENERO-", font=("None 15"), size=(30, 1))],
         [sg.HorizontalSeparator()],
-        [sg.Button("Salvar alterações", size=(15, 2), button_color="#4169E1", pad=(30, 1)),
-         sg.Button("Visualizar Perfil", size=(15, 2), button_color="#4169E1", pad=(15, 1))]
+        [sg.Button("Salvar alterações", size=(15, 2), button_color="#4169E1",
+                   pad=(30, 1)),
+         sg.Button("Visualizar Perfil", size=(15, 2), button_color="#4169E1",
+                   pad=(15, 1))]
     ]
 
     # Frame que contém as informações do usuário
@@ -566,10 +573,12 @@ def perfil():
         [sg.Text("Gênero: ", size=(10, 1)), sg.Input(
             key="-GENERO-", font=("None 15"), size=(30, 1))],
         [sg.HorizontalSeparator()],
-        [sg.Button("Sair da conta", size=(10, 2), button_color="#4169E1", pad=(16, 1)),
+        [sg.Button("Sair da conta", size=(10, 2), button_color="#4169E1",
+                   pad=(16, 1)),
          sg.Button("Editar Perfil", size=(10, 2),
                    button_color="#4169E1", pad=(16, 1)),
-         sg.Button("Voltar", size=(10, 2), button_color="#4169E1", pad=(16, 1))]
+         sg.Button("Voltar", size=(10, 2), button_color="#4169E1",
+                   pad=(16, 1))]
 
     ]
     frame = sg.Frame("Informações do Usuário", frame_layout, size=(400, 300))
@@ -584,7 +593,8 @@ def perfil():
         exit()
     elif event == "Sair da conta":
         window.close()
-        login()
+        global id
+        id = login()
     elif event == "Editar Perfil":
         window.close()
         editar_perfil()
@@ -646,13 +656,14 @@ def front2():
     layout_do_frame_externo = [
         [frame_interno],
         [sg.HorizontalSeparator()],
-        [sg.Button("Frase do dia", button_color="#006400", size=(10,2), pad=(8,5)),
-         sg.Multiline("", 
-                        size=(50, 2), 
-                        disabled=True, 
-                        no_scrollbar=True, 
-                        auto_size_text=True, 
-                        key='-FRASE-')],
+        [sg.Button("Frase do dia", button_color="#006400", size=(10, 2),
+                   pad=(8, 5)),
+         sg.Multiline("",
+                      size=(50, 2),
+                      disabled=True,
+                      no_scrollbar=True,
+                      auto_size_text=True,
+                      key='-FRASE-')],
     ]
 
     # Frame externo
@@ -661,19 +672,20 @@ def front2():
     # Layout Principal
     layout = [
         [frame_externo],
-        
+
     ]
 
-    frases = ["Acredite em si mesmo e tudo será possível.","O sucesso é a soma de pequenos esforços repetidos dia após dia.","Você é mais forte do que imagina e pode fazer mais do que pensa.","Cada dia é uma nova oportunidade para ser melhor.","Desafios são o que fazem a vida interessante e superá-los é o que faz a vida significativa.","A persistência é o caminho do êxito.","Sonhe grande, comece pequeno, mas comece.","A vida começa no final da sua zona de conforto.","O segredo do sucesso é começar antes de estar pronto.","A melhor maneira de prever o futuro é criá-lo.","Acredite que você pode e você já está no meio do caminho.","O único lugar onde o sucesso vem antes do trabalho é no dicionário.","Não espere por oportunidades, crie-as.","Tudo o que você sempre quis está do outro lado do medo.","A jornada de mil milhas começa com um único passo.","Você é capaz de coisas incríveis.","Acredite que vale a pena viver e a sua crença ajudará a criar o fato.","Seja a mudança que você quer ver no mundo.","O fracasso é apenas a oportunidade de começar de novo com mais inteligência.","Nunca é tarde demais para ser o que você poderia ter sido.","O único limite para a nossa realização de amanhã são as nossas dúvidas de hoje.","Coragem não é a ausência do medo, mas a conquista dele.","Você nunca saberá do que é capaz até tentar.","Transforme seus sonhos em metas e suas metas em realidade.","A maior glória em viver não está em nunca cair, mas em levantar cada vez que caímos.","Faça hoje o que outros não querem, para ter amanhã o que outros não terão.","O sucesso é ir de fracasso em fracasso sem perder o entusiasmo.","A maior aventura que você pode ter é viver a vida dos seus sonhos.","Acredite nos seus sonhos e eles podem se tornar realidade.","Você não precisa ser perfeito para começar, mas precisa começar para ser perfeito.","Você é o autor da sua própria história.","Acredite no seu potencial ilimitado.","Não importa o quão devagar você vá, desde que você não pare.","Seu único limite é você mesmo.","O futuro pertence àqueles que acreditam na beleza dos seus sonhos.","Não deixe que os erros de ontem ocupem muito do seu hoje.","Você é a média das cinco pessoas com quem passa mais tempo.","Tenha fé em si mesmo e nos seus sonhos.","Cada sonho que você deixa para trás é um pedaço do seu futuro que deixa de existir.","Se você pode sonhar, você pode realizar.","A diferença entre quem você é e quem você quer ser é o que você faz.","Não espere por circunstâncias perfeitas, crie-as.","Você não pode mudar seu passado, mas pode mudar seu futuro.","A melhor maneira de começar é parar de falar e começar a fazer.","Acredite que você pode, e você já está no meio do caminho.","O sucesso não é final, o fracasso não é fatal: é a coragem de continuar que conta.","Se você quer algo que nunca teve, você precisa fazer algo que nunca fez.","A vida é 10% o que acontece com você e 90% como você reage a isso.","Você é mais forte do que pensa e mais capaz do que imagina.","Nunca subestime o poder dos seus sonhos."]
-    
+    frases = ["Acredite em si mesmo e tudo será possível.", "O sucesso é a soma de pequenos esforços repetidos dia após dia.", "Você é mais forte do que imagina e pode fazer mais do que pensa.", "Cada dia é uma nova oportunidade para ser melhor.", "Desafios são o que fazem a vida interessante e superá-los é o que faz a vida significativa.", "A persistência é o caminho do êxito.", "Sonhe grande, comece pequeno, mas comece.", "A vida começa no final da sua zona de conforto.", "O segredo do sucesso é começar antes de estar pronto.", "A melhor maneira de prever o futuro é criá-lo.", "Acredite que você pode e você já está no meio do caminho.", "O único lugar onde o sucesso vem antes do trabalho é no dicionário.", "Não espere por oportunidades, crie-as.", "Tudo o que você sempre quis está do outro lado do medo.", "A jornada de mil milhas começa com um único passo.", "Você é capaz de coisas incríveis.", "Acredite que vale a pena viver e a sua crença ajudará a criar o fato.", "Seja a mudança que você quer ver no mundo.", "O fracasso é apenas a oportunidade de começar de novo com mais inteligência.", "Nunca é tarde demais para ser o que você poderia ter sido.", "O único limite para a nossa realização de amanhã são as nossas dúvidas de hoje.", "Coragem não é a ausência do medo, mas a conquista dele.", "Você nunca saberá do que é capaz até tentar.", "Transforme seus sonhos em metas e suas metas em realidade.", "A maior glória em viver não está em nunca cair, mas em levantar cada vez que caímos.",
+              "Faça hoje o que outros não querem, para ter amanhã o que outros não terão.", "O sucesso é ir de fracasso em fracasso sem perder o entusiasmo.", "A maior aventura que você pode ter é viver a vida dos seus sonhos.", "Acredite nos seus sonhos e eles podem se tornar realidade.", "Você não precisa ser perfeito para começar, mas precisa começar para ser perfeito.", "Você é o autor da sua própria história.", "Acredite no seu potencial ilimitado.", "Não importa o quão devagar você vá, desde que você não pare.", "Seu único limite é você mesmo.", "O futuro pertence àqueles que acreditam na beleza dos seus sonhos.", "Não deixe que os erros de ontem ocupem muito do seu hoje.", "Você é a média das cinco pessoas com quem passa mais tempo.", "Tenha fé em si mesmo e nos seus sonhos.", "Cada sonho que você deixa para trás é um pedaço do seu futuro que deixa de existir.", "Se você pode sonhar, você pode realizar.", "A diferença entre quem você é e quem você quer ser é o que você faz.", "Não espere por circunstâncias perfeitas, crie-as.", "Você não pode mudar seu passado, mas pode mudar seu futuro.", "A melhor maneira de começar é parar de falar e começar a fazer.", "Acredite que você pode, e você já está no meio do caminho.", "O sucesso não é final, o fracasso não é fatal: é a coragem de continuar que conta.", "Se você quer algo que nunca teve, você precisa fazer algo que nunca fez.", "A vida é 10% o que acontece com você e 90% como você reage a isso.", "Você é mais forte do que pensa e mais capaz do que imagina.", "Nunca subestime o poder dos seus sonhos."]
+
     # Janela
     window = sg.Window("Agenda", layout, size=(
         500, 430), element_justification="left")
-    
+
     def update(window):
         frase_aleatoria = choice(frases)
         window['-FRASE-'].update(frase_aleatoria)
-        
+
     while True:
         button, values = window.read()
         # Condições
@@ -690,16 +702,21 @@ def front2():
             window.close()
             lembretes()
         elif button == "Perfil":
-            window.close( )
+            window.close()
             perfil()
         elif button == "Frase do dia":
             update(window)
         elif button == sg.WINDOW_CLOSED:
             exit()
 
+
 # ICON PARA O APP
 icon = icon()
 sg.set_global_icon(icon)
 
-id = login()
-front2()
+"""registro()
+front2()"""
+def main():
+    init()
+
+main()
