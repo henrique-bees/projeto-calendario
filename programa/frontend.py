@@ -10,7 +10,7 @@ def login():
     sg.theme("DarkGrey16")
     frame = [
         [sg.T("Usuário: "), sg.I(key="-NAME-")],
-        [sg.T("Senha:   "), sg.I(key="-SENHA-", password_char="*", size=(36,2)),sg.Button("∞", key="-SHOW_PASSWORD-", 
+        [sg.T("Senha:   "), sg.I(key="-SENHA-", password_char="*", size=(36,2)),sg.Button("👁", key="-SHOW_PASSWORD-", 
                                                                                           border_width=0, button_color=("#343434"))],
         [sg.HorizontalSeparator()],
         [sg.Button("Esqueci minha senha", button_color="#4169E1")],
@@ -333,8 +333,74 @@ def eventos():
             window.close()
             front2()
 
-# Inserindo uma função para a janela alarmes
-def alarmes():
+# Inserindo uma função para a janela relógio
+def relógio():
+    sg.theme("DarkGrey16")
+
+    # Frame com os botões
+    buttons_layout = [
+        [sg.Button("Cronômetro", button_color="#4169E1", size=(11,2)), 
+         sg.Button("Temporizador", button_color="#4169E1", size=(11,2)), 
+         sg.Button("Despertador", button_color="#4169E1", size=(11,2))]
+    ]
+    buttons_frame = sg.Frame(None, buttons_layout, size=(320, 50), relief='sunken')
+
+    frame_layout_hora = [
+        [sg.Column([
+        [sg.Frame(None, [[sg.Text("00", font=("Arial", 30), key='-HORAS_DIGITS-')]], size=(64, 60), relief='ridge'),
+         sg.Text(":", font=("Arial", 20)),
+         sg.Frame(None, [[sg.Text("00", font=("Arial", 30), key='-MINUTOS_DIGITS-')]], size=(64, 60), relief='ridge'),
+         sg.Text(":", font=("Arial", 20)),
+         sg.Frame(None, [[sg.Text("00", font=("Arial", 30), key='-SEGUNDOS_DIGITS-')]], size=(64, 60), relief='ridge')]],
+        expand_x=True, pad=(15, 15, 15, 0))]  # Reduziu a distância superior da coluna
+    ]
+    frame_hora = sg.Frame(None, frame_layout_hora)
+
+    digits_frame_layout = [
+        [sg.Column([
+            [sg.Text("HORA ATUAL", font=("Arial", 20))]],   expand_x=True, pad=(60, 20, 0, 10))],
+        [frame_hora],
+        [sg.VPush()],
+        [sg.HorizontalSeparator()],
+        [sg.Button("Voltar", button_color="#4169E1", size=(10,2), pad=(120,0))]
+         
+    ]
+    digits_frame = sg.Frame(None, digits_frame_layout, size=(320, 400), relief='sunken')
+
+    frame_layout_externo = [
+        [buttons_frame],
+        [digits_frame]
+    ]
+    frame_global_layout = [
+        [sg.Frame(None, frame_layout_externo)]
+    ]
+
+    layout = [
+        [frame_global_layout]
+    ]
+
+    window = sg.Window("Relógio", layout, size=(370,380))
+
+    while True:
+        event, values = window.read(timeout=1000)  # Atualizar a cada segundo
+        if event == sg.WINDOW_CLOSED:
+            break
+        elif event == "Voltar":
+            window.close()
+            front2()
+        elif event == "Cronômetro":
+            ""
+        elif event == "Temporizador":
+            ""
+        elif event == "Despetador":
+            ""
+        # Atualizar a hora
+        current_time = time.localtime()
+        # Atualizar os dígitos individuais de horas, minutos e segundos
+        window['-HORAS_DIGITS-'].update('{:02d}'.format(current_time.tm_hour))
+        window['-MINUTOS_DIGITS-'].update('{:02d}'.format(current_time.tm_min))
+        window['-SEGUNDOS_DIGITS-'].update('{:02d}'.format(current_time.tm_sec))
+    window.close()
     # Tema
     sg.theme("DarkGrey16")
 
@@ -361,6 +427,12 @@ def alarmes():
     if button == "Voltar para página anterior":
         front2()
 
+def cronômetro():
+    ""
+def temporizador():
+    ""
+def despertador():
+    ""
 # Inserindo uma função para a janela anotações
 def anotações():
     # Temas
@@ -391,7 +463,6 @@ def anotações():
         window.close()
         exit()
     elif button == "Adicionar":
-        window.close()
 
         def novo_texto():
             frame_layout = [
@@ -551,7 +622,7 @@ def front2():
     buttons_layout = [
         [sg.Button("Eventos", size=(10, 2), button_color=("#4169E1"),
                    pad=(1, 1)),
-         sg.Button("Alarmes", size=(10, 2),
+         sg.Button("Relógio", size=(10, 2),
                    button_color=("#4169E1"), pad=(1, 1)),
          sg.Button("Anotações", size=(10, 2),
                    button_color=("#4169E1"), pad=(1, 1)),
@@ -592,9 +663,9 @@ def front2():
         if button == "Eventos":
             window.close()
             eventos()
-        elif button == "Alarmes":
+        elif button == "Relógio":
             window.close()
-            alarmes()
+            relógio()
         elif button == "Anotações":
             window.close()
             anotações()
@@ -611,4 +682,4 @@ def front2():
 icon = icon()
 sg.set_global_icon(icon)
 
-perfil()
+front2()
