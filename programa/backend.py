@@ -4,42 +4,42 @@ import sqlite3 as sq
 def criar(tipo, data, titulo, id):
     conexao = sq.connect("programa/registro.db")
     cursor = conexao.cursor()
-    query = f"INSERT INTO {tipo} (data, titulo, id_pins) VALUES (?, ?, ?)"
-    cursor.execute(query, (data, titulo, id))
-    conexao.commit()
-    conexao.close()
+    try:
+        query = f"SELECT MAX(posição) FROM {tipo} WHERE id_pins = ?"
+        cursor.execute(query, (id,))
+        resultado = cursor.fetchone()[0]
+        if resultado is not None:
+            index = resultado + 1
+        else:
+            index = 1
+    finally:
+        query = f"INSERT INTO {tipo} (posição, data, titulo, id_pins) VALUES (?, ?, ?, ?)"
+        cursor.execute(query, (index, data, titulo, id))
+        conexao.commit()
+        conexao.close()
+        return index
 
 
-def deletar(tipo, id):
+def deletar(tipo, index, id):
     conexao = sq.connect("programa/registro.db")
     cursor = conexao.cursor()
-    query = f"DELETE FROM {tipo} WHERE id = ?"
-    cursor.execute(query, (id,))
+    query = f"DELETE FROM {tipo} WHERE posição = ? and id_pins = ?"
+    cursor.execute(query, (index, id,))
+    query = f"UPDATE {tipo} SET posição = posição - 1 WHERE id_pins = ? AND posição > ?"
+    cursor.execute(query, (id, index))
     conexao.commit()
     conexao.close()
+    print("a")
 
 
 def ler_salvos(tipo, id):
     conexao = sq.connect("programa/registro.db")
     cursor = conexao.cursor()
-    query = f"SELECT * FROM {tipo} WHERE id_pins = ?"
+    query = f"SELECT posição, data, titulo FROM {tipo} WHERE id_pins = ?"
     cursor.execute(query, (id,))
     conteudo = cursor.fetchall()
     conexao.close()
     return conteudo
-
-
-def atualizar_index(tipo, id):
-    conexao = sq.connect("programa/registro.db")
-    cursor = conexao.cursor()
-    try:
-        query = f"SELECT id FROM {tipo} WHERE id_pins = ?"
-        cursor.execute(query, (id,))
-        id_atualizado = cursor.fetchall()
-        conexao.close()
-        return id_atualizado[-1][0]
-    finally:
-        return 0
 
 
 def verificar_senha(senha):
