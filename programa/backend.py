@@ -29,7 +29,6 @@ def deletar(tipo, index, id):
     cursor.execute(query, (id, index))
     conexao.commit()
     conexao.close()
-    print("a")
 
 
 def ler_salvos(tipo, id):

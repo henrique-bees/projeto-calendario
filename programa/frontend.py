@@ -290,7 +290,7 @@ def eventos():
                 data = window["-DATA-"].get().split()[0]
                 titulo = values["-EVENTO-"]
                 c = bc.criar(tipo, data, titulo, id)
-                nota = [[c, data, values["-EVENTO-"]]]
+                nota = [(c, data, values["-EVENTO-"])]
                 conteudo += nota
                 window["-TABLE-"].update(conteudo)
                 window["-EVENTO-"].update("")
@@ -303,9 +303,8 @@ def eventos():
             if values["-TABLE-"]:
                 index = values["-TABLE-"][0] + 1
                 bc.deletar(tipo, index, id)
-                del conteudo[index]
+                conteudo = bc.ler_salvos(tipo, id)
                 window["-TABLE-"].update(conteudo)
-                window["-TABLE-"].update(index)
                 window["-EVENTO-"].update("")
 
         # Voltar para pagina anterior
