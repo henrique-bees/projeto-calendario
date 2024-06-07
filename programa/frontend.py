@@ -98,7 +98,7 @@ def registro():
             expand_x=True, pad=(0, (50, 0))
         )]
     ]
-    window = sg.Window("Registro", layout, size=(400, 210))
+    window = sg.Window("Registro", layout, size=(400, 200))
     while True:
         event, values = window.read()
         if event == sg.WINDOW_CLOSED or event == "Cancel":
@@ -186,7 +186,7 @@ def nova_senha():
             expand_x=True, pad=(0, (50, 0)
                                 ))]
     ]
-    window = sg.Window("Recuperação de senha", layout, size=(400, 163))
+    window = sg.Window("Recuperação de senha", layout, size=(400, 155))
     while True:
         event, values = window.read()
         if event == sg.WINDOW_CLOSED:
@@ -269,6 +269,7 @@ def init():
 
 
 def eventos():
+    # =================================================================================================================================================#
     # Temas
     sg.theme("DarkGrey16")
     # Layout Interface
@@ -301,7 +302,7 @@ def eventos():
                                           button_color="#4169E1"), ]],
             element_justification="center", expand_x=True, pad=(0, (10, 0)))],
     ]
-
+    # =================================================================================================================================================#
     # Info Janela
     window = sg.Window("Eventos", layout, size=(
         600, 400), element_justification=("left"))
@@ -322,7 +323,7 @@ def eventos():
                 data = window["-DATA-"].get().split()[0]
                 titulo = values["-EVENTO-"]
                 c = bc.criar(tipo, data, titulo, id)
-                nota = [[c, data, values["-EVENTO-"]]]
+                nota = [(c, data, values["-EVENTO-"])]
                 conteudo += nota
                 window["-TABLE-"].update(conteudo)
                 window["-EVENTO-"].update("")
@@ -335,9 +336,8 @@ def eventos():
             if values["-TABLE-"]:
                 index = values["-TABLE-"][0] + 1
                 bc.deletar(tipo, index, id)
-                del conteudo[index]
+                conteudo = bc.ler_salvos(tipo, id)
                 window["-TABLE-"].update(conteudo)
-                window["-TABLE-"].update(index)
                 window["-EVENTO-"].update("")
 
         # Voltar para pagina anterior
@@ -432,7 +432,7 @@ def relógio():
              sg.Button("Sair", size=(20, 2), button_color="#4169E1")]
         ], element_justification="center", expand_x=True, pad=(0, (220, 0)))],
     ]
-
+    # =================================================================================================================================================#
     # Info Janela
     window = sg.Window("Alarmes", layout, size=(700, 300),
                        element_justification=("center"))
@@ -445,6 +445,7 @@ def relógio():
     # Voltar para página anterior
     if button == "Voltar para página anterior":
         front2()
+    # =================================================================================================================================================#
 
 
 def cronômetro():
@@ -467,11 +468,10 @@ def anotações():
 
     frame_layout = [
         [sg.VPush()],
-        [sg.HorizontalSeparator()],
-        [sg.Button("Adicionar", button_color="#4169E1", size=(12, 2), pad=(9, 1)),
+        [sg.Button("Adicionar", button_color="#4169E1", size=(10, 2), pad=(16, 1)),
          sg.Button("Deletar", button_color="#4169E1",
-                   size=(12, 2), pad=(9, 2)),
-         sg.Button("Voltar", button_color="#4169E1", size=(12, 2), pad=(9, 2))]
+                   size=(10, 2), pad=(16, 2)),
+         sg.Button("Voltar", button_color="#4169E1", size=(10, 2), pad=(16, 2))]
     ]
 
     layout = [
@@ -480,7 +480,7 @@ def anotações():
     ]
 
     # Info Janela
-    window = sg.Window("Anotações", layout, size=(
+    window = sg.Window("Tarefas", layout, size=(
         400, 400), element_justification=("left"))
 
     button, values = window.read()
@@ -489,6 +489,7 @@ def anotações():
         window.close()
         exit()
     elif button == "Adicionar":
+        window.close()
 
         def novo_texto():
             frame_layout = [
@@ -504,7 +505,7 @@ def anotações():
                 [sg.Frame("Criar novo texto", frame_layout, size=(300, 200))]
             ]
 
-            window = sg.Window("Novo Texto", layout, size=(300, 100))
+            window = sg.Window("Novo Texto", layout, size=(300, 200))
             button, values = window.read()
 
             # """elif button == "Deletar":"""
@@ -531,6 +532,10 @@ def editar_perfil():
             key="-EMAIL-", font=("None 15"), size=(30, 1))],
         [sg.Text("Telefone: ", size=(10, 1)), sg.Input(
             key="-TELEFONE-", font=("None 15"), size=(30, 1))],
+        [sg.Text("Idade: ", size=(10, 1)), sg.Input(
+            key="-IDADE-", font=("None 15"), size=(30, 1))],
+        [sg.Text("Gênero: ", size=(10, 1)), sg.Input(
+            key="-GENERO-", font=("None 15"), size=(30, 1))],
         [sg.HorizontalSeparator()],
         [sg.Button("Salvar alterações", size=(15, 2), button_color="#4169E1",
                    pad=(30, 1)),
@@ -545,7 +550,7 @@ def editar_perfil():
     layout = [
         [frame],
     ]
-    window = sg.Window("Editar Perfil", layout, size=(400, 220))
+    window = sg.Window("Editar Perfil", layout, size=(400, 276))
     button, values = window.read()
     window.close()
 
@@ -572,6 +577,10 @@ def perfil():
             key="-EMAIL-", font=("None 15"), size=(30, 1))],
         [sg.Text("Telefone: ", size=(10, 1)), sg.Input(
             key="-TELEFONE-", font=("None 15"), size=(30, 1))],
+        [sg.Text("Idade: ", size=(10, 1)), sg.Input(
+            key="-IDADE-", font=("None 15"), size=(30, 1))],
+        [sg.Text("Gênero: ", size=(10, 1)), sg.Input(
+            key="-GENERO-", font=("None 15"), size=(30, 1))],
         [sg.HorizontalSeparator()],
         [sg.Button("Sair da conta", size=(10, 2), button_color="#4169E1",
                    pad=(16, 1)),
@@ -586,7 +595,7 @@ def perfil():
     layout = [
         [frame]
     ]
-    window = sg.Window("Perfil", layout, size=(400, 220))
+    window = sg.Window("Perfil", layout, size=(400, 276))
     event, values = window.read()
 
     if event == sg.WINDOW_CLOSED:
@@ -657,7 +666,7 @@ def front2():
     buttons_layout = [
         [sg.Button("Eventos", size=(10, 2), button_color=("#4169E1"),
                    pad=(1, 1)),
-         sg.Button("Relógio", size=(10, 2),
+         sg.Button("Alarmes", size=(10, 2),
                    button_color=("#4169E1"), pad=(1, 1)),
          sg.Button("Anotações", size=(10, 2),
                    button_color=("#4169E1"), pad=(1, 1)),
@@ -698,9 +707,9 @@ def front2():
         if button == "Eventos":
             window.close()
             eventos()
-        elif button == "Relógio":
+        elif button == "Alarmes":
             window.close()
-            relógio()
+            alarmes()
         elif button == "Anotações":
             window.close()
             anotações()
@@ -717,4 +726,4 @@ def front2():
 icon = icon()
 sg.set_global_icon(icon)
 
-front2()
+init()
