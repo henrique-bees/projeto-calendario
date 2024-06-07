@@ -74,9 +74,9 @@ def registro():
     frame = [
         [sg.T("Usuário:             "), sg.I(key="-NAME-")],
         [sg.T("Senha:               "), sg.I(key="-SENHA-",
-                                             password_char="*", size=(30,2)),sg.Button("∞", key="-SHOW_PASSWORD-", border_width=0, button_color="#343434")],
+                                             password_char="*", size=(30,2)),sg.Button("👁", key="-SHOW_PASSWORD-", border_width=0, button_color="#343434")],
         [sg.T("Confirmar Senha:"), sg.I(key="-SENHA2-",
-                                        password_char="*", size=(30,2)),sg.Button("∞", key="-SHOW_CONFIRM_PASSWORD-", border_width=0, button_color="#343434")],
+                                        password_char="*", size=(30,2)),sg.Button("👁", key="-SHOW_CONFIRM_PASSWORD-", border_width=0, button_color="#343434")],
         [sg.HorizontalSeparator()],
         [sg.Button("Já possuo um login", button_color="#4169E1"),
          sg.VerticalSeparator(),
@@ -164,9 +164,9 @@ def nova_senha():
          sg.I(key="-USUARIO-")],
         [sg.HorizontalSeparator()],
         [sg.T("Senha:               "),
-         sg.I(key="-SENHA-", password_char="*", size=(29,2)),sg.Button("∞", key="-SHOW_PASSWORD-", 
+         sg.I(key="-SENHA-", password_char="*", size=(29,2)),sg.Button("👁", key="-SHOW_PASSWORD-", 
                                                                                           border_width=0, button_color=("#343434"))],
-        [sg.T("Confirmar Senha:"), sg.I(key="-SENHA2-", password_char="*", size=(29,2)),sg.Button("∞", key="-SHOW_CONFIRM_PASSWORD-", 
+        [sg.T("Confirmar Senha:"), sg.I(key="-SENHA2-", password_char="*", size=(29,2)),sg.Button("👁", key="-SHOW_CONFIRM_PASSWORD-", 
                                                                                           border_width=0, button_color=("#343434"))],
     ]
 
@@ -432,10 +432,6 @@ def editar_perfil():
             key="-EMAIL-", font=("None 15"), size=(30, 1))],
         [sg.Text("Telefone: ", size=(10, 1)), sg.Input(
             key="-TELEFONE-", font=("None 15"), size=(30, 1))],
-        [sg.Text("Idade: ", size=(10, 1)), sg.Input(
-            key="-IDADE-", font=("None 15"), size=(30, 1))],
-        [sg.Text("Gênero: ", size=(10, 1)), sg.Input(
-            key="-GENERO-", font=("None 15"), size=(30, 1))],
         [sg.HorizontalSeparator()],
         [sg.Button("Salvar alterações", size=(15, 2), button_color="#4169E1",
                    pad=(30, 1)),
@@ -450,7 +446,7 @@ def editar_perfil():
     layout = [
         [frame],
     ]
-    window = sg.Window("Editar Perfil", layout, size=(400, 276))
+    window = sg.Window("Editar Perfil", layout, size=(400, 220))
     button, values = window.read()
     window.close()
 
@@ -475,10 +471,6 @@ def perfil():
             key="-EMAIL-", font=("None 15"), size=(30, 1))],
         [sg.Text("Telefone: ", size=(10, 1)), sg.Input(
             key="-TELEFONE-", font=("None 15"), size=(30, 1))],
-        [sg.Text("Idade: ", size=(10, 1)), sg.Input(
-            key="-IDADE-", font=("None 15"), size=(30, 1))],
-        [sg.Text("Gênero: ", size=(10, 1)), sg.Input(
-            key="-GENERO-", font=("None 15"), size=(30, 1))],
         [sg.HorizontalSeparator()],
         [sg.Button("Sair da conta", size=(10, 2), button_color="#4169E1",
                    pad=(16, 1)),
@@ -493,7 +485,7 @@ def perfil():
     layout = [
         [frame]
     ]
-    window = sg.Window("Perfil", layout, size=(400, 276))
+    window = sg.Window("Perfil", layout, size=(400, 220))
     event, values = window.read()
 
     if event == sg.WINDOW_CLOSED:
@@ -514,27 +506,35 @@ def verificação():
     frame_layout = [
         [sg.Text("Usuário:", size=(7, 1)), sg.Input(key="-USUARIO-")],
         [sg.HorizontalSeparator()],
-        [sg.Text("Senha:", size=(7, 1)), sg.Input(key="-SENHA-")],
-
-        [sg.Button("Ok"), sg.Button("Cancel")],
-
+        [sg.Text("Senha:", size=(7, 1)), sg.Input(key="-SENHA-", password_char="*", size=(22,2)),sg.Button("👁", key="-SHOW_PASSWORD-", 
+                                                                                          border_width=0, button_color=("#343434"))],
     ]
 
     layout = [
         [sg.Frame(None, frame_layout)],
+        [sg.Button("Ok", button_color="#4169E1"), sg.Button("Cancel", button_color="#4169E1")],
     ]
+    
     window = sg.Window("Verificação", layout, size=(300, 115))
-    event, values = window.read()
-    if event == sg.WINDOW_CLOSED:
-        exit()
-    elif event == "Ok":
-        window.close()
-        sg.popup("Informações modificadas com sucesso")
-        perfil()
-    elif event == "Cancel":
-        sg.popup("Tentativa de edição mal sucedida")
-        window.close()
-        front2()
+        
+    while True:  
+        event, values = window.read()
+        if event == sg.WINDOW_CLOSED:
+            exit()
+        elif event == "-SHOW_PASSWORD-":
+            password_input = window['-SENHA-']
+            if password_input.Widget.cget("show") == "*":  
+                password_input.Widget.config(show="")
+            else:
+                password_input.Widget.config(show="*")
+        elif event == "Ok":
+            window.close()
+            sg.popup("Informações modificadas com sucesso")
+            perfil()
+        elif event == "Cancel":
+            sg.popup("Tentativa de edição mal sucedida")
+            window.close()
+            front2()
 
 # Página de inicialização do App
 def front2():
@@ -611,4 +611,4 @@ def front2():
 icon = icon()
 sg.set_global_icon(icon)
 
-nova_senha()
+perfil()
