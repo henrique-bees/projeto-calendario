@@ -2,7 +2,7 @@ import backend as bc
 import PySimpleGUI as sg
 import sqlite3 as sq
 import time
-import threading
+# import threading
 from random import choice
 
 # Inserindo função de login
