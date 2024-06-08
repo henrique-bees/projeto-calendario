@@ -284,7 +284,7 @@ def eventos():
         # Botão de Calendário
         [sg.CalendarButton("Escolher Data", format='%Y-%m-%d', size=(
             10, 1), button_color="#4169E1"), sg.Text("-- -- -- -- -- --",
-            key="-DATA-")],
+                                                     key="-DATA-")],
         # Input de nota
         [sg.T("Insira o seu evento:", size=(16, 1)), sg.I(
             key="-EVENTO-", font=("None 15"), size=(40, 1))],
@@ -766,34 +766,45 @@ def front2():
          sg.Button("Perfil", size=(10, 2), button_color=("#4169E1"),
                    pad=(13, 1))],
     ]
+    conexao = sq.connect("programa/registro.db")
+    cursor = conexao.cursor()
+    cursor.execute(
+        "SELECT data, titulo FROM eventos WHERE id_pins = ? ORDER BY data",
+        (id,))
+    resultado = cursor.fetchmany(3)
 
     layout_frame_eventos_recentes = [
-        [sg.Table(values="", headings=("DATA", "HORA", "EVENTOS RECENTES"),key="-TABLE-", enable_events=True, size=(500, 10),
-                  auto_size_columns=False, col_widths=[9, 9, 35],
-                  vertical_scroll_only=False,justification="l",
-                  font=("Arial", 15)) ]
+        [sg.Table(
+            values=resultado, headings=("DATA | HORA", "EVENTOS RECENTES"),
+            key="-TABLE-", enable_events=True, size=(500, 10),
+            auto_size_columns=False, col_widths=[18, 35],
+            vertical_scroll_only=False, justification="l",
+            font=("Arial", 15))]
     ]
 
     layout_despertador = [
 
     ]
-    
-    frame_despertador = sg.Frame("Despertadores Recentes", layout_despertador, size=(500, 100))
+
+    frame_despertador = sg.Frame(
+        "Despertadores Recentes", layout_despertador, size=(500, 100))
 
     # Frame interno que contém os botões
     frame_interno = sg.Frame(None, buttons_layout, size=(500, 45))
 
-    frame_eventos_recentes = sg.Frame("Eventos Recentes", layout_frame_eventos_recentes, size=(500,150))
+    frame_eventos_recentes = sg.Frame(
+        "Eventos Recentes", layout_frame_eventos_recentes, size=(500, 150))
+    conexao.close()
     # Layout do frame externo que contém o frame interno
     layout_do_frame_externo = [
         [frame_interno],
         [sg.HorizontalSeparator()],
         [frame_eventos_recentes],
         [frame_despertador],
-        #Espaço para novo frame
-        
-        
-        
+        # Espaço para novo frame
+
+
+
         [sg.VPush()],
         [sg.Column([
             [sg.HorizontalSeparator()],
