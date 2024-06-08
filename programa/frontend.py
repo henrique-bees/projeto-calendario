@@ -370,7 +370,6 @@ def eventos():
         # Sistema de notificações
 
 
-
 # Inserindo uma função para a janela relógio
 
 
@@ -449,7 +448,6 @@ def relógio():
             '{:02d}'.format(current_time.tm_sec))
 
 #   Inserindo uma função para a janela cronômetro
-
 
 
 def cronômetro():
@@ -540,23 +538,28 @@ def cronômetro():
             window['-MINUTOS_DIGITS-'].update('{:02d}'.format(int(minutes)))
             window['-SEGUNDOS_DIGITS-'].update('{:02d}'.format(int(seconds)))
 
+
 def format_time(hours, minutes, seconds):
     return '{:02}:{:02}:{:02}'.format(int(hours), int(minutes), int(seconds))
 
+
 def temporizador():
     sg.theme("DarkGrey16")
-    
+
     # Inputs
     layout_frame_horas = [
-        [sg.Text("HORAS:", size=(10,1)), sg.Input(size=(10, 1), key='-HORAS-')]
+        [sg.Text("HORAS:", size=(10, 1)), sg.Input(
+            size=(10, 1), key='-HORAS-')]
     ]
-    
+
     layout_frame_minutos = [
-        [sg.Text("MINUTOS:", size=(10,1)), sg.Input(size=(10, 1), key='-MINUTOS-')]
+        [sg.Text("MINUTOS:", size=(10, 1)), sg.Input(
+            size=(10, 1), key='-MINUTOS-')]
     ]
 
     layout_frame_segundos = [
-        [sg.Text("SEGUNDOS:", size=(10,1)), sg.Input(size=(10, 1), key='-SEGUNDOS-')]
+        [sg.Text("SEGUNDOS:", size=(10, 1)), sg.Input(
+            size=(10, 1), key='-SEGUNDOS-')]
     ]
 
     # Frames
@@ -572,47 +575,48 @@ def temporizador():
     ]
     layout_frame_ds = [
         [sg.Text("00", font=("Arial", 20), key='-DISPLAY_SECONDS-')]
-    ]    
+    ]
 
     layout_frame_temporizador = [
         [sg.Column([
-            [sg.Frame(None, layout_frame_dh, size=(50,50)),
-            sg.Text(":"),   
-            sg.Frame(None, layout_frame_dm, size=(50,50)),
-            sg.Text(":"),   
-            sg.Frame(None, layout_frame_ds, size=(50,50))]],expand_x=True, element_justification="center", pad=(0,20,0,0))] 
-        ]
+            [sg.Frame(None, layout_frame_dh, size=(50, 50)),
+             sg.Text(":"),
+             sg.Frame(None, layout_frame_dm, size=(50, 50)),
+             sg.Text(":"),
+             sg.Frame(None, layout_frame_ds, size=(50, 50))]], expand_x=True, element_justification="center", pad=(0, 20, 0, 0))]
+    ]
 
-    layout_temporizador = sg.Frame(None, layout_frame_temporizador, size=(350,100))
+    layout_temporizador = sg.Frame(
+        None, layout_frame_temporizador, size=(350, 100))
 
     # Frame Global
     layout_frame_global = [
-    [sg.Column([
+        [sg.Column([
             [frame_segundos],
             [frame_minutos],
-            [frame_horas],], 
-            justification='l'), sg.VerticalSeparator(), 
-            
-            sg.Column([
-            [sg.Button("INICIAR", size=(8,1), button_color="#4169E1")], 
-            [sg.Button("RESETAR", size=(8,1), button_color="#4169E1")],
-            [sg.Button("Voltar", size=(8,1), button_color="#4169E1")],])],
-            [sg.HorizontalSeparator()],    
-            [layout_temporizador]  
+            [frame_horas],],
+            justification='l'), sg.VerticalSeparator(),
+
+         sg.Column([
+             [sg.Button("INICIAR", size=(8, 1), button_color="#4169E1")],
+             [sg.Button("RESETAR", size=(8, 1), button_color="#4169E1")],
+             [sg.Button("Voltar", size=(8, 1), button_color="#4169E1")],])],
+        [sg.HorizontalSeparator()],
+        [layout_temporizador]
     ]
-    
-    frame_global = sg.Frame(None,layout_frame_global, size=(400,250))
+
+    frame_global = sg.Frame(None, layout_frame_global, size=(400, 250))
 
     layout = [
         [frame_global]
     ]
-    
+
     start_time = None
     paused_time = 0
     target_time = None
 
-    window = sg.Window("Temporizador", layout, size=(340,250))
-    
+    window = sg.Window("Temporizador", layout, size=(340, 250))
+
     while True:
         event, values = window.read(timeout=100)
         if event == sg.WINDOW_CLOSED:
@@ -621,14 +625,17 @@ def temporizador():
             if start_time is None:
                 try:
                     hours = int(values['-HORAS-']) if values['-HORAS-'] else 0
-                    minutes = int(values['-MINUTOS-']) if values['-MINUTOS-'] else 0
-                    seconds = int(values['-SEGUNDOS-']) if values['-SEGUNDOS-'] else 0
+                    minutes = int(values['-MINUTOS-']
+                                  ) if values['-MINUTOS-'] else 0
+                    seconds = int(values['-SEGUNDOS-']
+                                  ) if values['-SEGUNDOS-'] else 0
                     if hours < 0 or minutes < 0 or seconds < 0:
                         raise ValueError
                     target_time = hours * 3600 + minutes * 60 + seconds
                     start_time = time.time()
                 except ValueError:
-                    sg.popup('Por favor, insira números válidos e maiores ou iguais a zero para as horas, minutos e segundos.', button_color="#4169E1")
+                    sg.popup(
+                        'Por favor, insira números válidos e maiores ou iguais a zero para as horas, minutos e segundos.', button_color="#4169E1")
         elif event == "RESETAR":
             start_time = None
             paused_time = 0
@@ -660,6 +667,7 @@ def temporizador():
         elif event == "Voltar":
             window.close()
             relógio()
+
 
 def despertador():
     ""
@@ -930,13 +938,16 @@ def front2():
     layout_frame_anotações = [
 
     ]
-    
+
     layout_frame_historico = [
 
     ]
-    frame_historico = sg.Frame("Histórico Geral", layout_frame_historico, size=(500,100))
-    frame_anotações = sg.Frame("Anotações Recentes", layout_frame_anotações, size=(500, 100))
-    frame_despertador = sg.Frame("Alarmes Recentes", layout_despertador, size=(500, 100))
+    frame_historico = sg.Frame(
+        "Histórico Geral", layout_frame_historico, size=(500, 100))
+    frame_anotações = sg.Frame(
+        "Anotações Recentes", layout_frame_anotações, size=(500, 100))
+    frame_despertador = sg.Frame(
+        "Alarmes Recentes", layout_despertador, size=(500, 100))
 
     # Frame interno que contém os botões
     frame_interno = sg.Frame(None, buttons_layout, size=(500, 45))
