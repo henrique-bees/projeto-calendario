@@ -7,6 +7,10 @@ import pygame
 
 import threading
 from random import choice
+from datetime import datetime
+
+#   Inserindo função de login
+
 
 # Inserindo função de login
 
@@ -31,7 +35,7 @@ def login():
             expand_x=True, pad=(0, (50, 0))
         )]
     ]
-    window = sg.Window("Login", layout, size=(400, 160))
+    window = sg.Window("Login", layout, size=(400, 165))
 
     while True:
         event, values = window.read()
@@ -189,7 +193,7 @@ def nova_senha():
             expand_x=True, pad=(0, (50, 0)
                                 ))]
     ]
-    window = sg.Window("Recuperação de senha", layout, size=(400, 163))
+    window = sg.Window("Recuperação de senha", layout, size=(400, 165))
     while True:
         event, values = window.read()
         if event == sg.WINDOW_CLOSED:
@@ -227,6 +231,11 @@ def nova_senha():
                     sg.popup_timed("A nova senha foi cadastrada com sucesso!",
                                    auto_close_duration=5, button_color="#4169E1")
                     login()
+                else:
+                    sg.popup_timed("A senha não preenche os requisitos de senha forte. Sua"
+                                   " senha precisa conter pelo menos: 1 letra maiúscula, 1 letra minúscula,"
+                                   " 1 número e 1 caractére especial. Além de conter no mínimo 8 caractéres"
+                                   " e no máximo 16", auto_close_duration=5, button_color="#4169E1")
             else:
                 sg.popup_timed(
                     "As senhas não coincidem ou o usuário é vazio, por favor,"
@@ -280,13 +289,14 @@ def eventos():
     layout = [
 
         # Botão de Calendário
-        [sg.CalendarButton("Escolher Data", size=(
-            10, 1), button_color="#4169E1", format="%Y/%m/%d"), sg.Text("-- -- -- -- -- --",
-                                                                        key="-DATA-"),
-         # Input de hora
-         sg.T("Insira o horário (Hh:Mm):", size=(18, 1),), sg.I(
-            key="-HORA-", font=("None 15"), size=(20, 1))],
-
+        [sg.CalendarButton("Escolher Data", format='%Y-%m-%d', size=(
+            10, 1), button_color="#4169E1", target="-DATA-"), sg.Multiline(
+            font=("None 15"), size=(10, 1), disabled=True, no_scrollbar=True,
+            key="-DATA-"),
+         sg.Text('Hora'), sg.Combo(
+             [f'{i:02d}' for i in range(24)], key='-HORA-', size=(5, 1)),
+         sg.Text('Minuto'), sg.Combo(
+             [f'{i:02d}' for i in range(60)], key='-MINUTO-', size=(5, 1))],
         # Input de nota
         [sg.T("Insira o seu evento:", size=(16, 1)), sg.I(
             key="-EVENTO-", font=("None 15"), size=(40, 1))],
@@ -296,8 +306,8 @@ def eventos():
         # Headings são os titulos, col_widths são os tamanhos das colunas
         [sg.Table(values=conteudo, headings=["Index", "Data", "Evento"],
                   key="-TABLE-", enable_events=True, size=(500, 10),
-                  auto_size_columns=False, col_widths=[5, 9, 30],
-                  vertical_scroll_only=False, justification="l",
+                  auto_size_columns=False, col_widths=[5, 14, 23],
+                  vertical_scroll_only=True, justification="l",
                   font=("None 15"))],
 
         # Criar coluna, inserir botões de adicionar e deletar, dar keys a eles.
@@ -309,7 +319,6 @@ def eventos():
                                           button_color="#4169E1"), ]],
             element_justification="center", expand_x=True, pad=(0, (10, 0)))],
     ]
-
     # Info Janela
     window = sg.Window("Eventos", layout, size=(
         600, 400), element_justification=("left"))
@@ -321,19 +330,25 @@ def eventos():
         # Fechar App
         if button == sg.WINDOW_CLOSED:
             window.close()
-            quit()
+            exit()
 
         # Botão de Adicionar notas
         elif button == "Adicionar":
             titulo = values["-EVENTO-"]
             if titulo != "":
                 data = window["-DATA-"].get().split()[0]
-                titulo = values["-EVENTO-"]
-                c = bc.criar(tipo, data, titulo, id)
-                nota = [[c, data, values["-EVENTO-"]]]
-                conteudo += nota
-                window["-TABLE-"].update(conteudo)
-                window["-EVENTO-"].update("")
+                hora = values["-HORA-"] + ":" + values["-MINUTO-"]
+                selected_date = datetime.strptime(data, '%Y-%m-%d').date()
+                if selected_date < datetime.now().date():
+                    sg.popup(
+                        "Você não pode adicionar um evento com data no passado!", button_color="#4169E1")
+                else:
+                    titulo = values["-EVENTO-"]
+                    c = bc.criar(tipo, data, hora, titulo, id)
+                    nota = [(c, data + " - " + hora, values["-EVENTO-"])]
+                    conteudo += nota
+                    window["-TABLE-"].update(conteudo)
+                    window["-EVENTO-"].update("")
             else:
                 sg.popup_timed("É necessário inserir uma tarefa",
                                auto_close_duration=2)
@@ -343,9 +358,8 @@ def eventos():
             if values["-TABLE-"]:
                 index = values["-TABLE-"][0] + 1
                 bc.deletar(tipo, index, id)
-                del conteudo[index]
+                conteudo = bc.ler_salvos(tipo, id)
                 window["-TABLE-"].update(conteudo)
-                window["-TABLE-"].update(index)
                 window["-EVENTO-"].update("")
 
         # Voltar para pagina anterior
@@ -405,8 +419,7 @@ def relógio():
                                       key='-MINUTOS_DIGITS-')]], size=(64, 60), relief='ridge'),
              sg.Text(":", font=("Arial", 20)),
              sg.Frame(None, [[sg.Text("00", font=("Arial", 30), key='-SEGUNDOS_DIGITS-')]], size=(64, 60), relief='ridge')]],
-            # Reduziu a distância superior da coluna
-            expand_x=True, pad=(15, 15, 15, 0))]
+            expand_x=True, pad=(15, 15, 15, 0))]  # Reduziu a distância superior da coluna
     ]
     frame_hora = sg.Frame(None, frame_layout_hora)
 
@@ -440,12 +453,13 @@ def relógio():
     while True:
         event, values = window.read(timeout=1000)  # Atualizar a cada segundo
         if event == sg.WINDOW_CLOSED:
-            break
+            exit()
         elif event == "Voltar":
             window.close()
             front2()
         elif event == "Cronômetro":
-            ""
+            window.close()
+            cronômetro()
         elif event == "Temporizador":
             ""
         elif event == "Despetador":
@@ -457,36 +471,98 @@ def relógio():
         window['-MINUTOS_DIGITS-'].update('{:02d}'.format(current_time.tm_min))
         window['-SEGUNDOS_DIGITS-'].update(
             '{:02d}'.format(current_time.tm_sec))
-    window.close()
-    # Tema
-    sg.theme("DarkGrey16")
 
-    # Layout Interface
-    layout = [
-        [sg.Text("Aqui você marcará os seus alarmes", font=("Arial", 20))],
-        [sg.Column([
-            [sg.Button("Voltar para página anterior", size=(20, 2),
-                       button_color="#4169E1"),
-             sg.Button("Sair", size=(20, 2), button_color="#4169E1")]
-        ], element_justification="center", expand_x=True, pad=(0, (220, 0)))],
-    ]
+#   Inserindo uma função para a janela cronômetro
 
-    # Info Janela
-    window = sg.Window("Alarmes", layout, size=(700, 300),
-                       element_justification=("center"))
-    button, values = window.read()
-
-    # Fechar App
-    if button == "Sair" or button == sg.WINDOW_CLOSED:
-        exit()
-    window.close()
-    # Voltar para página anterior
-    if button == "Voltar para página anterior":
-        front2()
 
 
 def cronômetro():
-    ""
+    sg.theme("DarkGrey16")
+
+    # Frame com os botões
+    buttons_layout = [
+        [sg.Button("INICIAR", key='-START-', button_color="#4169E1", size=(11, 2)),
+         sg.Button("PAUSAR", key='-PAUSE-',
+                   button_color="#4169E1", size=(11, 2)),
+         sg.Button("RESETAR", key='-RESET-', button_color="#4169E1", size=(11, 2))]
+    ]
+    buttons_frame = sg.Frame(None, buttons_layout,
+                             size=(320, 50), relief='sunken')
+
+    frame_layout_hora = [
+        [sg.Column([
+            [sg.Frame(None, [[sg.Text("00", font=("Arial", 30), key='-HORAS_DIGITS-')]], size=(64, 60), relief='ridge'),
+             sg.Text(":", font=("Arial", 20)),
+             sg.Frame(None, [[sg.Text("00", font=(
+                 "Arial", 30), key='-MINUTOS_DIGITS-')]], size=(64, 60), relief='ridge'),
+             sg.Text(":", font=("Arial", 20)),
+             sg.Frame(None, [[sg.Text("00", font=("Arial", 30), key='-SEGUNDOS_DIGITS-')]], size=(64, 60), relief='ridge')]],
+            expand_x=True, pad=(15, 15, 15, 0))]  # Reduziu a distância superior da coluna
+    ]
+    frame_hora = sg.Frame(None, frame_layout_hora)
+
+    digits_frame_layout = [
+        [sg.Column([
+            [sg.Text("CRONÔMETRO", font=("Arial", 20))]], expand_x=True, pad=(50, 10, 0, 10))],
+        [frame_hora],
+        [sg.VPush()],
+        [sg.HorizontalSeparator()],
+        [sg.Button("Voltar", button_color="#4169E1",
+                   size=(10, 2), pad=(120, 0))]
+    ]
+    digits_frame = sg.Frame(None, digits_frame_layout,
+                            size=(320, 400), relief='sunken')
+
+    frame_layout_externo = [
+        [buttons_frame],
+        [digits_frame]
+    ]
+    frame_global_layout = [
+        [sg.Frame(None, frame_layout_externo)]
+    ]
+
+    layout = [
+        [frame_global_layout]
+    ]
+
+    window = sg.Window("Cronômetro", layout, size=(370, 310))
+
+    # Variáveis de controle do cronômetro
+    start_time = 0
+    paused_time = 0
+    running = False
+
+    while True:
+        event, values = window.read(timeout=10)  # Atualizar a cada segundo
+
+        if event == sg.WINDOW_CLOSED:
+            exit()
+        elif event == "Voltar":
+            window.close()
+            relógio()
+        elif event == '-START-':
+            if not running:
+                start_time = time.time() - paused_time
+                running = True
+        elif event == '-PAUSE-':
+            if running:
+                paused_time = time.time() - start_time
+                running = False
+        elif event == '-RESET-':
+            start_time = 0
+            paused_time = 0
+            running = False
+            window['-HORAS_DIGITS-'].update('00')
+            window['-MINUTOS_DIGITS-'].update('00')
+            window['-SEGUNDOS_DIGITS-'].update('00')
+
+        elif running:
+            elapsed_time = time.time() - start_time
+            hours, rem = divmod(elapsed_time, 3600)
+            minutes, seconds = divmod(rem, 60)
+            window['-HORAS_DIGITS-'].update('{:02d}'.format(int(hours)))
+            window['-MINUTOS_DIGITS-'].update('{:02d}'.format(int(minutes)))
+            window['-SEGUNDOS_DIGITS-'].update('{:02d}'.format(int(seconds)))
 
 
 def temporizador():
@@ -495,7 +571,7 @@ def temporizador():
 
 def despertador():
     ""
-# Inserindo uma função para a janela anotações
+#   Inserindo uma função para a janela anotações
 
 
 def anotações():
@@ -505,11 +581,10 @@ def anotações():
 
     frame_layout = [
         [sg.VPush()],
-        [sg.HorizontalSeparator()],
-        [sg.Button("Adicionar", button_color="#4169E1", size=(12, 2), pad=(9, 1)),
+        [sg.Button("Adicionar", button_color="#4169E1", size=(10, 2), pad=(16, 1)),
          sg.Button("Deletar", button_color="#4169E1",
-                   size=(12, 2), pad=(9, 2)),
-         sg.Button("Voltar", button_color="#4169E1", size=(12, 2), pad=(9, 2))]
+                   size=(10, 2), pad=(16, 2)),
+         sg.Button("Voltar", button_color="#4169E1", size=(10, 2), pad=(16, 2))]
     ]
 
     layout = [
@@ -518,7 +593,7 @@ def anotações():
     ]
 
     # Info Janela
-    window = sg.Window("Anotações", layout, size=(
+    window = sg.Window("Tarefas", layout, size=(
         400, 400), element_justification=("left"))
 
     button, values = window.read()
@@ -527,6 +602,7 @@ def anotações():
         window.close()
         exit()
     elif button == "Adicionar":
+        window.close()
 
         def novo_texto():
             frame_layout = [
@@ -542,7 +618,7 @@ def anotações():
                 [sg.Frame("Criar novo texto", frame_layout, size=(300, 200))]
             ]
 
-            window = sg.Window("Novo Texto", layout, size=(300, 100))
+            window = sg.Window("Novo Texto", layout, size=(300, 200))
             button, values = window.read()
 
             # """elif button == "Deletar":"""
@@ -554,7 +630,7 @@ def anotações():
                 front2()
         novo_texto()
 
-# Inserindo janela de edição de perfil
+#   Inserindo janela de edição de perfil
 
 
 def editar_perfil():
@@ -569,21 +645,23 @@ def editar_perfil():
             key="-EMAIL-", font=("None 15"), size=(30, 1))],
         [sg.Text("Telefone: ", size=(10, 1)), sg.Input(
             key="-TELEFONE-", font=("None 15"), size=(30, 1))],
+        [sg.Button("Alterar senha", size=(10, 1), button_color="#4169E1",
+                   pad=(10, 1))],
         [sg.HorizontalSeparator()],
         [sg.Button("Salvar alterações", size=(15, 2), button_color="#4169E1",
                    pad=(30, 1)),
          sg.Button("Visualizar Perfil", size=(15, 2), button_color="#4169E1",
-                   pad=(15, 1))]
+                   pad=(30, 1))]
     ]
 
     # Frame que contém as informações do usuário
-    frame = sg.Frame("Informações do Usuário", frame_layout, size=(400, 300))
+    frame = sg.Frame("Informações do Usuário", frame_layout, size=(400, 320))
 
     # Layout principal da janela
     layout = [
         [frame],
     ]
-    window = sg.Window("Editar Perfil", layout, size=(400, 220))
+    window = sg.Window("Editar Perfil", layout, size=(400, 236))
     button, values = window.read()
     window.close()
 
@@ -592,24 +670,55 @@ def editar_perfil():
     elif button == "Visualizar Perfil":
         window.close()
         perfil()
+    elif button == "Alterar senha":
+        nova_senha()
     elif button == "Salvar alterações":
-        ""
+        conexao = sq.connect("programa/registro.db")
+        cursor = conexao.cursor()
+        usuario = values["-USUARIO-"]
+        nome = values["-NOME-"]
+        email = values["-EMAIL-"]
+        telefone = values["-TELEFONE-"]
+        print(usuario, nome, email, telefone)
+        if usuario != "":
+            cursor.execute(
+                "UPDATE usuarios SET nome = ? WHERE id = ?", (usuario, id))
+        if nome != "":
+            cursor.execute(
+                "UPDATE infoad SET nome = ? WHERE id_perfil = ?", (nome, id))
+        if email != "":
+            cursor.execute(
+                "UPDATE infoad SET email = ? WHERE id_perfil = ?", (email, id))
+        if telefone != "":
+            cursor.execute(
+                "UPDATE infoad SET telefone = ? WHERE id_perfil = ?", (telefone, id))
+        conexao.commit()
+        conexao.close()
 
-# Inserindo janela de perfil
+        window.close()
+        perfil()
 
 
+#   Inserindo janela de perfil
 def perfil():
     sg.theme("DarkGrey16")
-
+    conexao = sq.connect("programa/registro.db")
+    cursor = conexao.cursor()
+    cursor.execute(
+        "SELECT nome, email, telefone FROM infoad WHERE id_perfil = ?", (id,))
+    resultado = cursor.fetchone()
+    cursor.execute("SELECT nome FROM usuarios WHERE id = ?", (id,))
+    resultado1 = cursor.fetchone()
+    conexao.close()
     frame_layout = [
-        [sg.Text("Usuário: ", size=(10, 1)), sg.Input(
-            key="-USUARIO-", font=("None 15"), size=(30, 1))],
-        [sg.Text("Nome: ", size=(10, 1)), sg.Input(
-            key="-NOME-", font=("None 15"), size=(30, 1))],
-        [sg.Text("Email: ", size=(10, 1)), sg.Input(
-            key="-EMAIL-", font=("None 15"), size=(30, 1))],
-        [sg.Text("Telefone: ", size=(10, 1)), sg.Input(
-            key="-TELEFONE-", font=("None 15"), size=(30, 1))],
+        [sg.Text("Usuário: ", size=(10, 1)), sg.Multiline(
+            font=("None 15"), size=(30, 1), disabled=True, no_scrollbar=True, default_text=resultado1[0])],
+        [sg.Text("Nome: ", size=(10, 1)), sg.Multiline(
+            font=("None 15"), size=(30, 1), disabled=True, no_scrollbar=True, default_text=resultado[0])],
+        [sg.Text("Email: ", size=(10, 1)), sg.Multiline(
+            font=("None 15"), size=(30, 1), disabled=True, no_scrollbar=True, default_text=resultado[1])],
+        [sg.Text("Telefone: ", size=(10, 1)), sg.Multiline(
+            font=("None 15"), size=(30, 1), disabled=True, no_scrollbar=True, default_text=resultado[2])],
         [sg.HorizontalSeparator()],
         [sg.Button("Sair da conta", size=(10, 2), button_color="#4169E1",
                    pad=(16, 1)),
@@ -617,14 +726,13 @@ def perfil():
                    button_color="#4169E1", pad=(16, 1)),
          sg.Button("Voltar", size=(10, 2), button_color="#4169E1",
                    pad=(16, 1))]
-
     ]
     frame = sg.Frame("Informações do Usuário", frame_layout, size=(400, 300))
 
     layout = [
         [frame]
     ]
-    window = sg.Window("Perfil", layout, size=(400, 220))
+    window = sg.Window("Perfil", layout, size=(400, 216))
     event, values = window.read()
 
     if event == sg.WINDOW_CLOSED:
@@ -639,7 +747,7 @@ def perfil():
         window.close()
         front2()
 
-# Inserindo função de verificação de autenticidade
+#   Inserindo função de verificação de autenticidade
 
 
 def verificação():
@@ -678,7 +786,7 @@ def verificação():
             window.close()
             front2()
 
-# Página de inicialização do App
+#   Página de inicialização do App
 
 
 def front2():
@@ -694,22 +802,57 @@ def front2():
     # Layout dos botões dentro do frame interno
     buttons_layout = [
         [sg.Button("Eventos", size=(10, 2), button_color=("#4169E1"),
-                   pad=(1, 1)),
+                   pad=(13, 1)),
          sg.Button("Relógio", size=(10, 2),
-                   button_color=("#4169E1"), pad=(1, 1)),
+                   button_color=("#4169E1"), pad=(13, 1)),
          sg.Button("Anotações", size=(10, 2),
-                   button_color=("#4169E1"), pad=(1, 1)),
+                   button_color=("#4169E1"), pad=(13, 1)),
          sg.Button("Perfil", size=(10, 2), button_color=("#4169E1"),
-                   pad=(1, 1))],
+                   pad=(13, 1))],
+    ]
+    conexao = sq.connect("programa/registro.db")
+    cursor = conexao.cursor()
+    cursor.execute(
+        "SELECT data, hora, titulo FROM eventos WHERE id_pins = ? ORDER BY data and hora",
+        (id,))
+    resultado = cursor.fetchmany(3)
+    conteudo = []
+    for i in range(len(resultado)):
+        j = resultado[i][0] + " - " + resultado[i][1], resultado[i][2]
+        conteudo.append(j)
+    conexao.close()
+
+    layout_frame_eventos_recentes = [
+        [sg.Table(
+            values=conteudo, headings=("DATA | HORA", "EVENTOS RECENTES"),
+            key="-TABLE-", enable_events=True, size=(500, 10),
+            auto_size_columns=False, col_widths=[14, 39],
+            vertical_scroll_only=False, justification="l",
+            font=("Arial", 15))]
     ]
 
-    # Frame interno que contém os botões
-    frame_interno = sg.Frame(None, buttons_layout)
+    layout_despertador = [
 
+    ]
+
+    frame_despertador = sg.Frame(
+        "Despertadores Recentes", layout_despertador, size=(500, 100))
+
+    # Frame interno que contém os botões
+    frame_interno = sg.Frame(None, buttons_layout, size=(500, 45))
+
+    frame_eventos_recentes = sg.Frame(
+        "Eventos Recentes", layout_frame_eventos_recentes, size=(500, 150))
     # Layout do frame externo que contém o frame interno
     layout_do_frame_externo = [
         [frame_interno],
         [sg.HorizontalSeparator()],
+        [frame_eventos_recentes],
+        [frame_despertador],
+        # Espaço para novo frame
+
+
+
         [sg.VPush()],
         [sg.Column([
             [sg.HorizontalSeparator()],
@@ -717,7 +860,7 @@ def front2():
              sg.Multiline("", size=(50, 2), disabled=True, no_scrollbar=True, auto_size_text=True, key='-FRASE-')]
         ], expand_x=True, pad=(0, 0, 0, 0))]]
     # Frame externo
-    frame_externo = sg.Frame(None, layout_do_frame_externo, size=(500, 430))
+    frame_externo = sg.Frame(None, layout_do_frame_externo, size=(500, 600))
 
     # Layout Principal
     layout = [
@@ -726,7 +869,7 @@ def front2():
 
     # Janela
     window = sg.Window("Agenda", layout, size=(
-        400, 430), element_justification="left", finalize=True)
+        500, 600), element_justification="left", finalize=True)
 
     update(window)
 
