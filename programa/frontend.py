@@ -2,16 +2,21 @@ import backend as bc
 import PySimpleGUI as sg
 import sqlite3 as sq
 import time
+from datetime import datetime
+import pygame
+
 import threading
 from random import choice
 
-# Inserindo função de login                     
+# Inserindo função de login
+
+
 def login():
     sg.theme("DarkGrey16")
     frame = [
         [sg.T("Usuário: "), sg.I(key="-NAME-")],
-        [sg.T("Senha:   "), sg.I(key="-SENHA-", password_char="*", size=(36,2)),sg.Button("👁", key="-SHOW_PASSWORD-", 
-                                                                                          border_width=0, button_color=("#343434"))],
+        [sg.T("Senha:   "), sg.I(key="-SENHA-", password_char="*", size=(36, 2)), sg.Button("👁", key="-SHOW_PASSWORD-",
+                                                                                            border_width=0, button_color=("#343434"))],
         [sg.HorizontalSeparator()],
         [sg.Button("Esqueci minha senha", button_color="#4169E1")],
     ]
@@ -37,11 +42,11 @@ def login():
             window.close()
             nova_senha()
         elif event == "-SHOW_PASSWORD-":
-                password_input = window['-SENHA-']
-                if password_input.Widget.cget("show") == "*":  
-                    password_input.Widget.config(show="")
-                else:
-                    password_input.Widget.config(show="*")
+            password_input = window['-SENHA-']
+            if password_input.Widget.cget("show") == "*":
+                password_input.Widget.config(show="")
+            else:
+                password_input.Widget.config(show="*")
         elif event == sg.WINDOW_CLOSED:
             exit()
         elif event == "Ok":
@@ -69,14 +74,16 @@ def login():
                          button_color="#4169E1")
 
 # Inserindo função de registro
+
+
 def registro():
     sg.theme("DarkGrey16")
     frame = [
         [sg.T("Usuário:             "), sg.I(key="-NAME-")],
         [sg.T("Senha:               "), sg.I(key="-SENHA-",
-                                             password_char="*", size=(30,2)),sg.Button("👁", key="-SHOW_PASSWORD-", border_width=0, button_color="#343434")],
+                                             password_char="*", size=(30, 2)), sg.Button("👁", key="-SHOW_PASSWORD-", border_width=0, button_color="#343434")],
         [sg.T("Confirmar Senha:"), sg.I(key="-SENHA2-",
-                                        password_char="*", size=(30,2)),sg.Button("👁", key="-SHOW_CONFIRM_PASSWORD-", border_width=0, button_color="#343434")],
+                                        password_char="*", size=(30, 2)), sg.Button("👁", key="-SHOW_CONFIRM_PASSWORD-", border_width=0, button_color="#343434")],
         [sg.HorizontalSeparator()],
         [sg.Button("Já possuo um login", button_color="#4169E1"),
          sg.VerticalSeparator(),
@@ -100,14 +107,14 @@ def registro():
         if event == sg.WINDOW_CLOSED or event == "Cancel":
             quit()
         elif event == "-SHOW_PASSWORD-":
-                password_input = window['-SENHA-']
-                if password_input.Widget.cget("show") == "*":  
-                    password_input.Widget.config(show="")
-                else:
-                    password_input.Widget.config(show="*")
+            password_input = window['-SENHA-']
+            if password_input.Widget.cget("show") == "*":
+                password_input.Widget.config(show="")
+            else:
+                password_input.Widget.config(show="*")
         elif event == "-SHOW_CONFIRM_PASSWORD-":
             password_input2 = window['-SENHA2-']
-            if password_input2.Widget.cget("show") == "*":  
+            if password_input2.Widget.cget("show") == "*":
                 password_input2.Widget.config(show="")
             else:
                 password_input2.Widget.config(show="*")
@@ -157,6 +164,8 @@ def registro():
                         auto_close_duration=5, button_color="#4169E1")
 
 # Inserindo função de criar uma nova senha
+
+
 def nova_senha():
     sg.theme("DarkGrey16")
     frame = [
@@ -164,10 +173,10 @@ def nova_senha():
          sg.I(key="-USUARIO-")],
         [sg.HorizontalSeparator()],
         [sg.T("Senha:               "),
-         sg.I(key="-SENHA-", password_char="*", size=(29,2)),sg.Button("👁", key="-SHOW_PASSWORD-", 
-                                                                                          border_width=0, button_color=("#343434"))],
-        [sg.T("Confirmar Senha:"), sg.I(key="-SENHA2-", password_char="*", size=(29,2)),sg.Button("👁", key="-SHOW_CONFIRM_PASSWORD-", 
-                                                                                          border_width=0, button_color=("#343434"))],
+         sg.I(key="-SENHA-", password_char="*", size=(29, 2)), sg.Button("👁", key="-SHOW_PASSWORD-",
+                                                                         border_width=0, button_color=("#343434"))],
+        [sg.T("Confirmar Senha:"), sg.I(key="-SENHA2-", password_char="*", size=(29, 2)), sg.Button("👁", key="-SHOW_CONFIRM_PASSWORD-",
+                                                                                                    border_width=0, button_color=("#343434"))],
     ]
 
     layout = [
@@ -187,13 +196,13 @@ def nova_senha():
             quit()
         elif event == "-SHOW_PASSWORD-":
             password_input = window['-SENHA-']
-            if password_input.Widget.cget("show") == "*":  
+            if password_input.Widget.cget("show") == "*":
                 password_input.Widget.config(show="")
             else:
                 password_input.Widget.config(show="*")
         elif event == "-SHOW_CONFIRM_PASSWORD-":
             password_input2 = window['-SENHA2-']
-            if password_input2.Widget.cget("show") == "*":  
+            if password_input2.Widget.cget("show") == "*":
                 password_input2.Widget.config(show="")
             else:
                 password_input2.Widget.config(show="*")
@@ -225,10 +234,14 @@ def nova_senha():
                     auto_close_duration=5, button_color="#4169E1")
 
 # Armazenando o icon base64
+
+
 def icon():
     return b"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kUM6tv9sV3TY6GOtOnco1pTKrIE9O7hwRHLU3MatO/k23pTOtFE7PHrsOm4yM0+nPLum66fQtIFjWLp4tnrgtEHDvZL29ZjS7ypzRk2bN3Lk0OE6Pj/KO3Tqv2mjxhnHuYcde+sRiGCCCi7IYIMOPghhhBJWY6CBE16IYYYabshhhx4WWOGBH45IYokmnogigiFWmGKLLr4IY4wRrhiijDbeiGOON9K4oo4+/ghkkBDy2KOQRh6JZJItEcmikk4+CaWMTNIYZZVWXrnhlDxiyWWXXrqnJZFfjklmmRSGuaWZaq5pJZpasglnnEG6iaacdt4JI5104slnnx3qCaifgg76IKDShgJAaKKKMndoo4guCmmkZzrqqKSWJkpppplcyqmdmn7KSaeieglqqaaeimqqqq7KaquuvgprrLLOSmuttt6Ka6667sprr77+Cmywwg5LbLHGHotsssouy2yzzj4LbbTSTktttdZei2222m7LbbfefgtuuOKOS2655p6Lbrrqrstuu+6+C2+88s5Lb7323otvvvruy2+//v4LcMACD0xwwQYfjHDCCi/McMMOPwxxxBJPTHHFFl+MccYab8xxxx5/DHLIIo9Mcskmn4xyyiqvzG0gADs="
 
 # Função para Animação da barra de progresso
+
+
 def init():
     sg.theme("DarkGrey16")
 
@@ -256,6 +269,8 @@ def init():
     registro()
 
 # Inserindo uma função para a janela eventos
+
+
 def eventos():
     # Temas
     sg.theme("DarkGrey16")
@@ -266,11 +281,16 @@ def eventos():
 
         # Botão de Calendário
         [sg.CalendarButton("Escolher Data", size=(
-            10, 1), button_color="#4169E1"), sg.Text("-- -- -- -- -- --",
-                                                     key="-DATA-")],
+            10, 1), button_color="#4169E1", format="%Y/%m/%d"), sg.Text("-- -- -- -- -- --",
+                                                                        key="-DATA-"),
+         # Input de hora
+         sg.T("Insira o horário (Hh:Mm):", size=(18, 1),), sg.I(
+            key="-HORA-", font=("None 15"), size=(20, 1))],
+
         # Input de nota
         [sg.T("Insira o seu evento:", size=(16, 1)), sg.I(
             key="-EVENTO-", font=("None 15"), size=(40, 1))],
+
 
         # Criar a Tabela com index, data, nota
         # Headings são os titulos, col_widths são os tamanhos das colunas
@@ -333,26 +353,60 @@ def eventos():
             window.close()
             front2()
 
+        # Sistema de notificações
+
+
+def obter_eventos_agendados():
+    conn = sq.connect("programa/registro.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT evento FROM eventos Where DATA = ? AND HORA = ?"),
+    eventos = cursor.fetchall()
+    conn.close()
+
+
+# add o pygame
+pygame.init()
+# adicione o caminho do arquivo
+som = pygame.mixer.Sound(r"C:\Users\Vitor\Downloads\caminho\discord-notification.mp3")
+
+
+while True:
+
+    eventos_agendados = obter_eventos_agendados()
+    data_atual = datetime.now().time()
+    for data_atual in eventos_agendados:
+        sg.popup(*[f"Evento: {evento[0]}" for evento in eventos_agendados],
+                 tittle="Notificação", keep_on_top=True)
+        som.play() #reproduzindo o som
+        time.sleep(60)  # Verifica a cada minuto
+    if sg.WINDOW_CLOSED:
+        break
+
 # Inserindo uma função para a janela relógio
+
+
 def relógio():
     sg.theme("DarkGrey16")
 
     # Frame com os botões
     buttons_layout = [
-        [sg.Button("Cronômetro", button_color="#4169E1", size=(11,2)), 
-         sg.Button("Temporizador", button_color="#4169E1", size=(11,2)), 
-         sg.Button("Despertador", button_color="#4169E1", size=(11,2))]
+        [sg.Button("Cronômetro", button_color="#4169E1", size=(11, 2)),
+         sg.Button("Temporizador", button_color="#4169E1", size=(11, 2)),
+         sg.Button("Despertador", button_color="#4169E1", size=(11, 2))]
     ]
-    buttons_frame = sg.Frame(None, buttons_layout, size=(320, 50), relief='sunken')
+    buttons_frame = sg.Frame(None, buttons_layout,
+                             size=(320, 50), relief='sunken')
 
     frame_layout_hora = [
         [sg.Column([
-        [sg.Frame(None, [[sg.Text("00", font=("Arial", 30), key='-HORAS_DIGITS-')]], size=(64, 60), relief='ridge'),
-         sg.Text(":", font=("Arial", 20)),
-         sg.Frame(None, [[sg.Text("00", font=("Arial", 30), key='-MINUTOS_DIGITS-')]], size=(64, 60), relief='ridge'),
-         sg.Text(":", font=("Arial", 20)),
-         sg.Frame(None, [[sg.Text("00", font=("Arial", 30), key='-SEGUNDOS_DIGITS-')]], size=(64, 60), relief='ridge')]],
-        expand_x=True, pad=(15, 15, 15, 0))]  # Reduziu a distância superior da coluna
+            [sg.Frame(None, [[sg.Text("00", font=("Arial", 30), key='-HORAS_DIGITS-')]], size=(64, 60), relief='ridge'),
+             sg.Text(":", font=("Arial", 20)),
+             sg.Frame(None, [[sg.Text("00", font=("Arial", 30),
+                                      key='-MINUTOS_DIGITS-')]], size=(64, 60), relief='ridge'),
+             sg.Text(":", font=("Arial", 20)),
+             sg.Frame(None, [[sg.Text("00", font=("Arial", 30), key='-SEGUNDOS_DIGITS-')]], size=(64, 60), relief='ridge')]],
+            # Reduziu a distância superior da coluna
+            expand_x=True, pad=(15, 15, 15, 0))]
     ]
     frame_hora = sg.Frame(None, frame_layout_hora)
 
@@ -362,10 +416,12 @@ def relógio():
         [frame_hora],
         [sg.VPush()],
         [sg.HorizontalSeparator()],
-        [sg.Button("Voltar", button_color="#4169E1", size=(10,2), pad=(120,0))]
-         
+        [sg.Button("Voltar", button_color="#4169E1",
+                   size=(10, 2), pad=(120, 0))]
+
     ]
-    digits_frame = sg.Frame(None, digits_frame_layout, size=(320, 400), relief='sunken')
+    digits_frame = sg.Frame(None, digits_frame_layout,
+                            size=(320, 400), relief='sunken')
 
     frame_layout_externo = [
         [buttons_frame],
@@ -379,7 +435,7 @@ def relógio():
         [frame_global_layout]
     ]
 
-    window = sg.Window("Relógio", layout, size=(370,380))
+    window = sg.Window("Relógio", layout, size=(370, 380))
 
     while True:
         event, values = window.read(timeout=1000)  # Atualizar a cada segundo
@@ -399,7 +455,8 @@ def relógio():
         # Atualizar os dígitos individuais de horas, minutos e segundos
         window['-HORAS_DIGITS-'].update('{:02d}'.format(current_time.tm_hour))
         window['-MINUTOS_DIGITS-'].update('{:02d}'.format(current_time.tm_min))
-        window['-SEGUNDOS_DIGITS-'].update('{:02d}'.format(current_time.tm_sec))
+        window['-SEGUNDOS_DIGITS-'].update(
+            '{:02d}'.format(current_time.tm_sec))
     window.close()
     # Tema
     sg.theme("DarkGrey16")
@@ -427,13 +484,20 @@ def relógio():
     if button == "Voltar para página anterior":
         front2()
 
+
 def cronômetro():
     ""
+
+
 def temporizador():
     ""
+
+
 def despertador():
     ""
 # Inserindo uma função para a janela anotações
+
+
 def anotações():
     # Temas
     sg.theme("DarkGrey16")
@@ -466,12 +530,12 @@ def anotações():
 
         def novo_texto():
             frame_layout = [
-                
+
                 [sg.Text("Nome do texto: ", font=("Arial", 10)),
                  sg.Input(key="-TAG-")],
                 [sg.HorizontalSeparator()],
-                [sg.Button("Salvar", button_color="#4169E1", size=(10,1), pad=(23,2)),
-                 sg.Button("Cancelar", button_color="#4169E1", size=(10,1), pad=(20,2))]
+                [sg.Button("Salvar", button_color="#4169E1", size=(10, 1), pad=(23, 2)),
+                 sg.Button("Cancelar", button_color="#4169E1", size=(10, 1), pad=(20, 2))]
             ]
 
             layout = [
@@ -491,6 +555,8 @@ def anotações():
         novo_texto()
 
 # Inserindo janela de edição de perfil
+
+
 def editar_perfil():
     sg.theme("DarkGrey16")
 
@@ -530,6 +596,8 @@ def editar_perfil():
         ""
 
 # Inserindo janela de perfil
+
+
 def perfil():
     sg.theme("DarkGrey16")
 
@@ -572,29 +640,32 @@ def perfil():
         front2()
 
 # Inserindo função de verificação de autenticidade
+
+
 def verificação():
     sg.theme("Darkgrey16")
     frame_layout = [
         [sg.Text("Usuário:", size=(7, 1)), sg.Input(key="-USUARIO-")],
         [sg.HorizontalSeparator()],
-        [sg.Text("Senha:", size=(7, 1)), sg.Input(key="-SENHA-", password_char="*", size=(22,2)),sg.Button("👁", key="-SHOW_PASSWORD-", 
-                                                                                          border_width=0, button_color=("#343434"))],
+        [sg.Text("Senha:", size=(7, 1)), sg.Input(key="-SENHA-", password_char="*", size=(22, 2)), sg.Button("👁", key="-SHOW_PASSWORD-",
+                                                                                                             border_width=0, button_color=("#343434"))],
     ]
 
     layout = [
         [sg.Frame(None, frame_layout)],
-        [sg.Button("Ok", button_color="#4169E1"), sg.Button("Cancel", button_color="#4169E1")],
+        [sg.Button("Ok", button_color="#4169E1"), sg.Button(
+            "Cancel", button_color="#4169E1")],
     ]
-    
+
     window = sg.Window("Verificação", layout, size=(300, 115))
-        
-    while True:  
+
+    while True:
         event, values = window.read()
         if event == sg.WINDOW_CLOSED:
             exit()
         elif event == "-SHOW_PASSWORD-":
             password_input = window['-SENHA-']
-            if password_input.Widget.cget("show") == "*":  
+            if password_input.Widget.cget("show") == "*":
                 password_input.Widget.config(show="")
             else:
                 password_input.Widget.config(show="*")
@@ -608,6 +679,8 @@ def verificação():
             front2()
 
 # Página de inicialização do App
+
+
 def front2():
     sg.theme("DarkGrey16")
 
@@ -682,4 +755,4 @@ def front2():
 icon = icon()
 sg.set_global_icon(icon)
 
-front2()
+init()
