@@ -968,7 +968,7 @@ def front2():
     frame_interno = sg.Frame(None, buttons_layout, size=(500, 45))
 
     frame_proximos_eventos = sg.Frame(
-        "Eventos Recentes", layout_frame_proximos_eventos, size=(500, 150))
+        "Proximos Eventos", layout_frame_proximos_eventos, size=(500, 150))
     # Layout do frame externo que contém o frame interno
     layout_do_frame_externo = [
         [frame_interno],
