@@ -291,9 +291,9 @@ def eventos():
             font=("None 15"), size=(10, 1), disabled=True, no_scrollbar=True,
             key="-DATA-"),
          sg.Text('Hora'), sg.Combo(
-             [f'{i:02d}' for i in range(24)], key='-HORA-', size=(5, 1)),
+             [f'{i:02d}' for i in range(24)], key='-HORA-', size=(5, 1), readonly=True),
          sg.Text('Minuto'), sg.Combo(
-             [f'{i:02d}' for i in range(60)], key='-MINUTO-', size=(5, 1))],
+             [f'{i:02d}' for i in range(60)], key='-MINUTO-', size=(5, 1), readonly=True)],
         # Input de nota
         [sg.T("Insira o seu evento:", size=(16, 1)), sg.I(
             key="-EVENTO-", font=("None 15"), size=(40, 1))],
@@ -334,18 +334,31 @@ def eventos():
             titulo = values["-EVENTO-"]
             if titulo != "":
                 data = window["-DATA-"].get().split()[0]
-                hora = values["-HORA-"] + ":" + values["-MINUTO-"]
-                selected_date = datetime.strptime(data, '%Y-%m-%d').date()
-                if selected_date < datetime.now().date():
-                    sg.popup(
-                        "Você não pode adicionar um evento com data no passado!", button_color="#4169E1")
+                hora = values["-HORA-"]
+                minuto = values["-MINUTO-"]
+                if hora != "" and minuto != "":
+                    agora = datetime.now()
+                    hora_atual = agora.strftime("%H:%M")
+                    hora_selecionada = f"{hora}:{minuto}"
+                    selected_date = datetime.strptime(data, '%Y-%m-%d').date()
+                    selected_hour = datetime.strptime(hora_selecionada,
+                                                      '%H:%M')
+                    current_hour = datetime.strptime(hora_atual, '%H:%M')
+                    if selected_date < datetime.now().date() or (selected_date == datetime.now().date() and selected_hour < current_hour):
+                        sg.popup(
+                            "Você não pode adicionar um evento com data no passado!",
+                            button_color="#4169E1")
+                    else:
+                        titulo = values["-EVENTO-"]
+                        c = bc.criar(tipo, data, hora_selecionada, titulo, id)
+                        nota = [(c, data + " - " + hora_selecionada,
+                                 values["-EVENTO-"])]
+                        conteudo += nota
+                        window["-TABLE-"].update(conteudo)
+                        window["-EVENTO-"].update("")
                 else:
-                    titulo = values["-EVENTO-"]
-                    c = bc.criar(tipo, data, hora, titulo, id)
-                    nota = [(c, data + " - " + hora, values["-EVENTO-"])]
-                    conteudo += nota
-                    window["-TABLE-"].update(conteudo)
-                    window["-EVENTO-"].update("")
+                    sg.popup_timed("É necessário inserir um horario",
+                                   auto_close_duration=2)
             else:
                 sg.popup_timed("É necessário inserir uma tarefa",
                                auto_close_duration=2)
@@ -914,7 +927,7 @@ def front2():
         conexao = sq.connect("programa/registro.db")
         cursor = conexao.cursor()
         cursor.execute(
-            "SELECT data, hora, titulo FROM eventos WHERE id_pins = ? ORDER BY data and hora",
+            "SELECT data, hora, titulo FROM eventos WHERE id_pins = ? ORDER BY data",
             (id,))
         resultado = cursor.fetchmany(3)
         conexao.close()
