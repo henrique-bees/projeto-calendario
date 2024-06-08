@@ -283,8 +283,13 @@ def eventos():
 
         # Botão de Calendário
         [sg.CalendarButton("Escolher Data", format='%Y-%m-%d', size=(
-            10, 1), button_color="#4169E1"), sg.Text("-- -- -- -- -- --",
-                                                     key="-DATA-")],
+            10, 1), button_color="#4169E1", target="-DATA-"), sg.Multiline(
+            font=("None 15"), size=(10, 1), disabled=True, no_scrollbar=True,
+            key="-DATA-"),
+         sg.Text('Hora'), sg.Combo(
+             [f'{i:02d}' for i in range(24)], key='-HORA-', size=(5, 1)),
+         sg.Text('Minuto'), sg.Combo(
+             [f'{i:02d}' for i in range(60)], key='-MINUTO-', size=(5, 1))],
         # Input de nota
         [sg.T("Insira o seu evento:", size=(16, 1)), sg.I(
             key="-EVENTO-", font=("None 15"), size=(40, 1))],
@@ -293,8 +298,8 @@ def eventos():
         # Headings são os titulos, col_widths são os tamanhos das colunas
         [sg.Table(values=conteudo, headings=["Index", "Data", "Evento"],
                   key="-TABLE-", enable_events=True, size=(500, 10),
-                  auto_size_columns=False, col_widths=[5, 9, 30],
-                  vertical_scroll_only=False, justification="l",
+                  auto_size_columns=False, col_widths=[5, 14, 23],
+                  vertical_scroll_only=True, justification="l",
                   font=("None 15"))],
 
         # Criar coluna, inserir botões de adicionar e deletar, dar keys a eles.
@@ -324,14 +329,15 @@ def eventos():
             titulo = values["-EVENTO-"]
             if titulo != "":
                 data = window["-DATA-"].get().split()[0]
+                hora = values["-HORA-"] + ":" + values["-MINUTO-"]
                 selected_date = datetime.strptime(data, '%Y-%m-%d').date()
                 if selected_date < datetime.now().date():
                     sg.popup(
                         "Você não pode adicionar um evento com data no passado!", button_color="#4169E1")
                 else:
                     titulo = values["-EVENTO-"]
-                    c = bc.criar(tipo, data, titulo, id)
-                    nota = [(c, data, values["-EVENTO-"])]
+                    c = bc.criar(tipo, data, hora, titulo, id)
+                    nota = [(c, data + " - " + hora, values["-EVENTO-"])]
                     conteudo += nota
                     window["-TABLE-"].update(conteudo)
                     window["-EVENTO-"].update("")
@@ -769,15 +775,20 @@ def front2():
     conexao = sq.connect("programa/registro.db")
     cursor = conexao.cursor()
     cursor.execute(
-        "SELECT data, titulo FROM eventos WHERE id_pins = ? ORDER BY data",
+        "SELECT data, hora, titulo FROM eventos WHERE id_pins = ? ORDER BY data and hora",
         (id,))
     resultado = cursor.fetchmany(3)
+    conteudo = []
+    for i in range(len(resultado)):
+        j = resultado[i][0] + " - " + resultado[i][1], resultado[i][2]
+        conteudo.append(j)
+    conexao.close()
 
     layout_frame_eventos_recentes = [
         [sg.Table(
-            values=resultado, headings=("DATA | HORA", "EVENTOS RECENTES"),
+            values=conteudo, headings=("DATA | HORA", "EVENTOS RECENTES"),
             key="-TABLE-", enable_events=True, size=(500, 10),
-            auto_size_columns=False, col_widths=[18, 35],
+            auto_size_columns=False, col_widths=[14, 39],
             vertical_scroll_only=False, justification="l",
             font=("Arial", 15))]
     ]
@@ -794,7 +805,6 @@ def front2():
 
     frame_eventos_recentes = sg.Frame(
         "Eventos Recentes", layout_frame_eventos_recentes, size=(500, 150))
-    conexao.close()
     # Layout do frame externo que contém o frame interno
     layout_do_frame_externo = [
         [frame_interno],
