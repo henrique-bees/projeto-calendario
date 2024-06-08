@@ -590,21 +590,31 @@ def editar_perfil():
         window.close()
         perfil()
     elif button == "Salvar alterações":
-        ""
+        window.close()
+        perfil()
+
 
 #   Inserindo janela de perfil
 def perfil():
     sg.theme("DarkGrey16")
-
+    conexao = sq.connect("programa/registro.db")
+    cursor = conexao.cursor()
+    cursor.execute("SELECT nome, email, telefone FROM infoad WHERE id_perfil = ?", (id,))
+    resultado = cursor.fetchone()
+    cursor.execute("SELECT nome FROM usuarios WHERE id = ?", (id,))
+    resultado1 = cursor.fetchone()
+    conexao.close()
+    print(resultado)
+    print(resultado1)
     frame_layout = [
-        [sg.Text("Usuário: ", size=(10, 1)), sg.Input(
-            key="-USUARIO-", font=("None 15"), size=(30, 1))],
-        [sg.Text("Nome: ", size=(10, 1)), sg.Input(
-            key="-NOME-", font=("None 15"), size=(30, 1))],
-        [sg.Text("Email: ", size=(10, 1)), sg.Input(
-            key="-EMAIL-", font=("None 15"), size=(30, 1))],
-        [sg.Text("Telefone: ", size=(10, 1)), sg.Input(
-            key="-TELEFONE-", font=("None 15"), size=(30, 1))],
+        [sg.Text("Usuário: ", size=(10, 1)), sg.Multiline(
+            font=("None 15"), size=(30, 1), disabled=True, no_scrollbar=True, default_text=resultado1[0])],
+        [sg.Text("Nome: ", size=(10, 1)), sg.Multiline(
+            font=("None 15"), size=(30, 1), disabled=True, no_scrollbar=True, default_text=resultado[0])],
+        [sg.Text("Email: ", size=(10, 1)), sg.Multiline(
+            font=("None 15"), size=(30, 1), disabled=True, no_scrollbar=True, default_text=resultado[1])],
+        [sg.Text("Telefone: ", size=(10, 1)), sg.Multiline(
+            font=("None 15"), size=(30, 1), disabled=True, no_scrollbar=True, default_text=resultado[2])],
         [sg.HorizontalSeparator()],
         [sg.Button("Sair da conta", size=(10, 2), button_color="#4169E1",
                    pad=(16, 1)),
