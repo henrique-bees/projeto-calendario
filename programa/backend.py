@@ -42,7 +42,6 @@ def ler_salvos(tipo, id):
     for i in range(len(resultado)):
         j = (resultado[i][0], resultado[i][1] + " - " + resultado[i][2], resultado[i][3])
         conteudo.append(j)
-    print(conteudo)
     return conteudo
 
 
@@ -72,5 +71,3 @@ def verificar_registro(usuario):
             return "invalido"
         else:
             return "valido"
-
-ler_salvos("eventos", 3)

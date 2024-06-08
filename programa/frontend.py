@@ -370,31 +370,6 @@ def eventos():
         # Sistema de notificações
 
 
-def obter_eventos_agendados():
-    conn = sq.connect("programa/registro.db")
-    cursor = conn.cursor()
-    cursor.execute("SELECT evento FROM eventos Where DATA = ? AND HORA = ?"),
-    eventos = cursor.fetchall()
-    conn.close()
-
-
-# add o pygame
-pygame.init()
-# adicione o caminho do arquivo
-som = pygame.mixer.Sound(r"C:\Users\Vitor\Downloads\caminho\discord-notification.mp3")
-
-
-while True:
-
-    eventos_agendados = obter_eventos_agendados()
-    data_atual = datetime.now().time()
-    for data_atual in eventos_agendados:
-        sg.popup(*[f"Evento: {evento[0]}" for evento in eventos_agendados],
-                 tittle="Notificação", keep_on_top=True)
-        som.play() #reproduzindo o som
-        time.sleep(60)  # Verifica a cada minuto
-    if sg.WINDOW_CLOSED:
-        break
 
 # Inserindo uma função para a janela relógio
 
