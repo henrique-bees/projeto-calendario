@@ -3,11 +3,8 @@ import PySimpleGUI as sg
 import sqlite3 as sq
 import time
 from datetime import datetime
-import pygame
-
-import threading
 from random import choice
-from datetime import datetime
+
 
 #   Inserindo função de login
 
@@ -773,27 +770,29 @@ def editar_perfil():
     elif button == "Alterar senha":
         nova_senha()
     elif button == "Salvar alterações":
-        conexao = sq.connect("programa/registro.db")
-        cursor = conexao.cursor()
-        usuario = values["-USUARIO-"]
-        nome = values["-NOME-"]
-        email = values["-EMAIL-"]
-        telefone = values["-TELEFONE-"]
-        print(usuario, nome, email, telefone)
-        if usuario != "":
-            cursor.execute(
-                "UPDATE usuarios SET nome = ? WHERE id = ?", (usuario, id))
-        if nome != "":
-            cursor.execute(
-                "UPDATE infoad SET nome = ? WHERE id_perfil = ?", (nome, id))
-        if email != "":
-            cursor.execute(
-                "UPDATE infoad SET email = ? WHERE id_perfil = ?", (email, id))
-        if telefone != "":
-            cursor.execute(
-                "UPDATE infoad SET telefone = ? WHERE id_perfil = ?", (telefone, id))
-        conexao.commit()
-        conexao.close()
+        try:
+            conexao = sq.connect("programa/registro.db")
+            cursor = conexao.cursor()
+            usuario = values["-USUARIO-"]
+            nome = values["-NOME-"]
+            email = values["-EMAIL-"]
+            telefone = values["-TELEFONE-"]
+            print(usuario, nome, email, telefone)
+            if usuario != "":
+                cursor.execute(
+                    "UPDATE usuarios SET nome = ? WHERE id = ?", (usuario, id))
+            if nome != "":
+                cursor.execute(
+                    "UPDATE infoad SET nome = ? WHERE id_perfil = ?", (nome, id))
+            if email != "":
+                cursor.execute(
+                    "UPDATE infoad SET email = ? WHERE id_perfil = ?", (email, id))
+            if telefone != "":
+                cursor.execute(
+                    "UPDATE infoad SET telefone = ? WHERE id_perfil = ?", (telefone, id))
+            conexao.commit()
+        finally:
+            conexao.close()
 
         window.close()
         perfil()
@@ -910,21 +909,24 @@ def front2():
          sg.Button("Perfil", size=(10, 2), button_color=("#4169E1"),
                    pad=(13, 1))],
     ]
-    conexao = sq.connect("programa/registro.db")
-    cursor = conexao.cursor()
-    cursor.execute(
-        "SELECT data, hora, titulo FROM eventos WHERE id_pins = ? ORDER BY data and hora",
-        (id,))
-    resultado = cursor.fetchmany(3)
-    conteudo = []
-    for i in range(len(resultado)):
-        j = resultado[i][0] + " - " + resultado[i][1], resultado[i][2]
-        conteudo.append(j)
-    conexao.close()
+
+    def eventos_recentes(id):
+        conexao = sq.connect("programa/registro.db")
+        cursor = conexao.cursor()
+        cursor.execute(
+            "SELECT data, hora, titulo FROM eventos WHERE id_pins = ? ORDER BY data and hora",
+            (id,))
+        resultado = cursor.fetchmany(3)
+        conexao.close()
+        conteudo = []
+        for i in range(len(resultado)):
+            j = resultado[i][0] + " - " + resultado[i][1], resultado[i][2]
+            conteudo.append(j)
+        return conteudo
 
     layout_frame_proximos_eventos = [
         [sg.Table(
-            values=conteudo, headings=("DATA | HORA", "PROXIMOS EVENTOS"),
+            values=eventos_recentes(id), headings=("DATA | HORA", "PROXIMOS EVENTOS"),
             key="-TABLE-", enable_events=True, size=(500, 10),
             auto_size_columns=False, col_widths=[14, 39],
             vertical_scroll_only=False, justification="l",
