@@ -418,7 +418,8 @@ def relógio():
             window.close()
             cronômetro()
         elif event == "Temporizador":
-            ""
+            window.close()
+            temporizador()
         elif event == "Despetador":
             ""
         # Atualizar a hora
@@ -520,10 +521,126 @@ def cronômetro():
             window['-MINUTOS_DIGITS-'].update('{:02d}'.format(int(minutes)))
             window['-SEGUNDOS_DIGITS-'].update('{:02d}'.format(int(seconds)))
 
+def format_time(hours, minutes, seconds):
+    return '{:02}:{:02}:{:02}'.format(int(hours), int(minutes), int(seconds))
 
 def temporizador():
-    ""
+    sg.theme("DarkGrey16")
+    
+    # Inputs
+    layout_frame_horas = [
+        [sg.Text("HORAS:", size=(10,1)), sg.Input(size=(10, 1), key='-HORAS-')]
+    ]
+    
+    layout_frame_minutos = [
+        [sg.Text("MINUTOS:", size=(10,1)), sg.Input(size=(10, 1), key='-MINUTOS-')]
+    ]
 
+    layout_frame_segundos = [
+        [sg.Text("SEGUNDOS:", size=(10,1)), sg.Input(size=(10, 1), key='-SEGUNDOS-')]
+    ]
+
+    # Frames
+    frame_segundos = sg.Frame(None, layout_frame_segundos)
+    frame_horas = sg.Frame(None, layout_frame_horas)
+    frame_minutos = sg.Frame(None, layout_frame_minutos)
+
+    layout_frame_dh = [
+        [sg.Text("00", font=("Arial", 20), key='-DISPLAY_HOURS-')],
+    ]
+    layout_frame_dm = [
+        [sg.Text("00", font=("Arial", 20), key='-DISPLAY_MINUTES-')]
+    ]
+    layout_frame_ds = [
+        [sg.Text("00", font=("Arial", 20), key='-DISPLAY_SECONDS-')]
+    ]    
+
+    layout_frame_temporizador = [
+        [sg.Column([
+            [sg.Frame(None, layout_frame_dh, size=(50,50)),
+            sg.Text(":"),   
+            sg.Frame(None, layout_frame_dm, size=(50,50)),
+            sg.Text(":"),   
+            sg.Frame(None, layout_frame_ds, size=(50,50))]],expand_x=True, element_justification="center", pad=(0,20,0,0))] 
+        ]
+
+    layout_temporizador = sg.Frame(None, layout_frame_temporizador, size=(350,100))
+
+    # Frame Global
+    layout_frame_global = [
+    [sg.Column([
+            [frame_segundos],
+            [frame_minutos],
+            [frame_horas],], 
+            justification='l'), sg.VerticalSeparator(), 
+            
+            sg.Column([
+            [sg.Button("INICIAR", size=(8,1), button_color="#4169E1")], 
+            [sg.Button("RESETAR", size=(8,1), button_color="#4169E1")],
+            [sg.Button("Voltar", size=(8,1), button_color="#4169E1")],])],
+            [sg.HorizontalSeparator()],    
+            [layout_temporizador]  
+    ]
+    
+    frame_global = sg.Frame(None,layout_frame_global, size=(400,250))
+
+    layout = [
+        [frame_global]
+    ]
+    
+    start_time = None
+    paused_time = 0
+    target_time = None
+
+    window = sg.Window("Temporizador", layout, size=(340,250))
+    
+    while True:
+        event, values = window.read(timeout=100)
+        if event == sg.WINDOW_CLOSED:
+            exit()
+        elif event == "INICIAR":
+            if start_time is None:
+                try:
+                    hours = int(values['-HORAS-']) if values['-HORAS-'] else 0
+                    minutes = int(values['-MINUTOS-']) if values['-MINUTOS-'] else 0
+                    seconds = int(values['-SEGUNDOS-']) if values['-SEGUNDOS-'] else 0
+                    if hours < 0 or minutes < 0 or seconds < 0:
+                        raise ValueError
+                    target_time = hours * 3600 + minutes * 60 + seconds
+                    start_time = time.time()
+                except ValueError:
+                    sg.popup('Por favor, insira números válidos e maiores ou iguais a zero para as horas, minutos e segundos.', button_color="#4169E1")
+        elif event == "RESETAR":
+            start_time = None
+            paused_time = 0
+            target_time = None
+            window['-DISPLAY_HOURS-'].update('00')
+            window['-DISPLAY_MINUTES-'].update('00')
+            window['-DISPLAY_SECONDS-'].update('00')
+            window['-HORAS-'].update('')
+            window['-MINUTOS-'].update('')
+            window['-SEGUNDOS-'].update('')
+        elif start_time is not None:
+            elapsed_time = time.time() - start_time - paused_time
+            remaining_time = max(target_time - elapsed_time, 0)
+            hours = remaining_time // 3600
+            minutes = (remaining_time % 3600) // 60
+            seconds = remaining_time % 60
+            window['-DISPLAY_HOURS-'].update(f'{int(hours):02}')
+            window['-DISPLAY_MINUTES-'].update(f'{int(minutes):02}')
+            window['-DISPLAY_SECONDS-'].update(f'{int(seconds):02}')
+            if remaining_time == 0:
+                sg.popup('Tempo Esgotado!', button_color=("#4169E1"))
+                window['-DISPLAY_HOURS-'].update('00')
+                window['-DISPLAY_MINUTES-'].update('00')
+                window['-DISPLAY_SECONDS-'].update('00')
+                window['-HORAS-'].update('')
+                window['-MINUTOS-'].update('')
+                window['-SEGUNDOS-'].update('')
+                start_time = None
+        elif event == "Voltar":
+            window.close()
+            relógio()
 
 def despertador():
     ""
@@ -777,8 +894,17 @@ def front2():
     layout_despertador = [
 
     ]
+
+    layout_frame_anotações = [
+
+    ]
     
-    frame_despertador = sg.Frame("Despertadores Recentes", layout_despertador, size=(500, 100))
+    layout_frame_historico = [
+
+    ]
+    frame_historico = sg.Frame("Histórico Geral", layout_frame_historico, size=(500,100))
+    frame_anotações = sg.Frame("Anotações Recentes", layout_frame_anotações, size=(500, 100))
+    frame_despertador = sg.Frame("Alarmes Recentes", layout_despertador, size=(500, 100))
 
     # Frame interno que contém os botões
     frame_interno = sg.Frame(None, buttons_layout, size=(500, 45))
@@ -790,10 +916,8 @@ def front2():
         [sg.HorizontalSeparator()],
         [frame_eventos_recentes],
         [frame_despertador],
-        #Espaço para novo frame
-        
-        
-        
+        [frame_anotações],
+        [frame_historico],
         [sg.VPush()],
         [sg.Column([
             [sg.HorizontalSeparator()],
@@ -810,7 +934,7 @@ def front2():
 
     # Janela
     window = sg.Window("Agenda", layout, size=(
-        500, 600), element_justification="left", finalize=True)
+        500, 620), element_justification="left", finalize=True)
 
     update(window)
 
