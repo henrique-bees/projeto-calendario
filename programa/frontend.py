@@ -282,7 +282,7 @@ def eventos():
     layout = [
 
         # Botão de Calendário
-        [sg.CalendarButton("Escolher Data", format='%H:%M:%S', size=(
+        [sg.CalendarButton("Escolher Data", format='%Y-%m-%d', size=(
             10, 1), button_color="#4169E1"), sg.Text("-- -- -- -- -- --",
             key="-DATA-")],
         # Input de nota
@@ -758,22 +758,42 @@ def front2():
     # Layout dos botões dentro do frame interno
     buttons_layout = [
         [sg.Button("Eventos", size=(10, 2), button_color=("#4169E1"),
-                   pad=(1, 1)),
+                   pad=(13, 1)),
          sg.Button("Relógio", size=(10, 2),
-                   button_color=("#4169E1"), pad=(1, 1)),
+                   button_color=("#4169E1"), pad=(13, 1)),
          sg.Button("Anotações", size=(10, 2),
-                   button_color=("#4169E1"), pad=(1, 1)),
+                   button_color=("#4169E1"), pad=(13, 1)),
          sg.Button("Perfil", size=(10, 2), button_color=("#4169E1"),
-                   pad=(1, 1))],
+                   pad=(13, 1))],
     ]
 
-    # Frame interno que contém os botões
-    frame_interno = sg.Frame(None, buttons_layout)
+    layout_frame_eventos_recentes = [
+        [sg.Table(values="", headings=("DATA", "HORA", "EVENTOS RECENTES"),key="-TABLE-", enable_events=True, size=(500, 10),
+                  auto_size_columns=False, col_widths=[9, 9, 35],
+                  vertical_scroll_only=False,justification="l",
+                  font=("Arial", 15)) ]
+    ]
 
+    layout_despertador = [
+
+    ]
+    
+    frame_despertador = sg.Frame("Despertadores Recentes", layout_despertador, size=(500, 100))
+
+    # Frame interno que contém os botões
+    frame_interno = sg.Frame(None, buttons_layout, size=(500, 45))
+
+    frame_eventos_recentes = sg.Frame("Eventos Recentes", layout_frame_eventos_recentes, size=(500,150))
     # Layout do frame externo que contém o frame interno
     layout_do_frame_externo = [
         [frame_interno],
         [sg.HorizontalSeparator()],
+        [frame_eventos_recentes],
+        [frame_despertador],
+        #Espaço para novo frame
+        
+        
+        
         [sg.VPush()],
         [sg.Column([
             [sg.HorizontalSeparator()],
@@ -781,7 +801,7 @@ def front2():
              sg.Multiline("", size=(50, 2), disabled=True, no_scrollbar=True, auto_size_text=True, key='-FRASE-')]
         ], expand_x=True, pad=(0, 0, 0, 0))]]
     # Frame externo
-    frame_externo = sg.Frame(None, layout_do_frame_externo, size=(500, 430))
+    frame_externo = sg.Frame(None, layout_do_frame_externo, size=(500, 600))
 
     # Layout Principal
     layout = [
@@ -790,7 +810,7 @@ def front2():
 
     # Janela
     window = sg.Window("Agenda", layout, size=(
-        400, 430), element_justification="left", finalize=True)
+        500, 600), element_justification="left", finalize=True)
 
     update(window)
 
