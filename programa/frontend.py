@@ -784,9 +784,9 @@ def front2():
         conteudo.append(j)
     conexao.close()
 
-    layout_frame_eventos_recentes = [
+    layout_frame_proximos_eventos = [
         [sg.Table(
-            values=conteudo, headings=("DATA | HORA", "EVENTOS RECENTES"),
+            values=conteudo, headings=("DATA | HORA", "PROXIMOS EVENTOS"),
             key="-TABLE-", enable_events=True, size=(500, 10),
             auto_size_columns=False, col_widths=[14, 39],
             vertical_scroll_only=False, justification="l",
@@ -803,13 +803,13 @@ def front2():
     # Frame interno que contém os botões
     frame_interno = sg.Frame(None, buttons_layout, size=(500, 45))
 
-    frame_eventos_recentes = sg.Frame(
-        "Eventos Recentes", layout_frame_eventos_recentes, size=(500, 150))
+    frame_proximos_eventos = sg.Frame(
+        "Eventos Recentes", layout_frame_proximos_eventos, size=(500, 150))
     # Layout do frame externo que contém o frame interno
     layout_do_frame_externo = [
         [frame_interno],
         [sg.HorizontalSeparator()],
-        [frame_eventos_recentes],
+        [frame_proximos_eventos],
         [frame_despertador],
         # Espaço para novo frame
 
