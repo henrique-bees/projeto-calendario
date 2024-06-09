@@ -743,6 +743,79 @@ def anotações():
 #   Inserindo janela de edição de perfil
 
 
+def senha_nova(id):
+    sg.theme("DarkGrey16")
+    frame = [
+        [sg.T("Senha Atual:      "),
+         sg.I(key="-SENHAA-")],
+        [sg.HorizontalSeparator()],
+        [sg.T("Senha:               "),
+         sg.I(key="-SENHA-", password_char="*", size=(29, 2)), sg.Button("👁", key="-SHOW_PASSWORD-",
+                                                                         border_width=0, button_color=("#343434"))],
+        [sg.T("Confirmar Senha:"), sg.I(key="-SENHA2-", password_char="*", size=(29, 2)),
+         sg.Button("👁", key="-SHOW_CONFIRM_PASSWORD-", border_width=0, button_color=("#343434"))],
+    ]
+    layout = [
+        [sg.Frame("Nova Senha", frame)],
+        [sg.Ok(button_color="#4169E1", size=(10, 1)), sg.B(
+            "Voltar", button_color="#4169E1", size=(10, 1))],
+    ]
+    window = sg.Window("Recuperação de senha", layout, size=(400, 165))
+    while True:
+        event, values = window.read()
+        if event == sg.WINDOW_CLOSED:
+            quit()
+        elif event == "-SHOW_PASSWORD-":
+            password_input = window['-SENHA-']
+            if password_input.Widget.cget("show") == "*":
+                password_input.Widget.config(show="")
+            else:
+                password_input.Widget.config(show="*")
+        elif event == "-SHOW_CONFIRM_PASSWORD-":
+            password_input2 = window['-SENHA2-']
+            if password_input2.Widget.cget("show") == "*":
+                password_input2.Widget.config(show="")
+            else:
+                password_input2.Widget.config(show="*")
+        elif event == "Voltar":
+            window.close()
+            editar_perfil()
+        elif event == "Ok":
+            senha_atual = values["-SENHAA-"]
+            senha = values["-SENHA-"]
+            senha2 = values["-SENHA2-"]
+            if senha == senha2:
+                valido = bc.verificar_senha(senha)
+                if valido:
+                    conexao = sq.connect("programa/registro.db")
+                    cursor = conexao.cursor()
+                    cursor.execute(
+                        "SELECT nome, senha FROM usuarios WHERE id = ?", (id,))
+                    usuario = cursor.fetchone()
+                    if senha_atual == usuario[1]:
+                        cursor.execute(
+                            "UPDATE usuarios SET senha = ? WHERE nome = ?",
+                            (senha, usuario[0]))
+                        conexao.commit()
+                        conexao.close()
+                        window.close()
+                        sg.popup_timed("A nova senha foi cadastrada com sucesso!",
+                                       auto_close_duration=5, button_color="#4169E1")
+                        login()
+                    else:
+                        sg.popup_timed("A senha atual é invalida",
+                                       auto_close_duration=5, burron_color="#4169E1")
+                else:
+                    sg.popup_timed("A senha não preenche os requisitos de senha forte. Sua"
+                                   " senha precisa conter pelo menos: 1 letra maiúscula, 1 letra minúscula,"
+                                   " 1 número e 1 caractére especial. Além de conter no mínimo 8 caractéres"
+                                   " e no máximo 16", auto_close_duration=5, button_color="#4169E1")
+            else:
+                sg.popup_timed(
+                    "As senhas não coincidem, por favor, tente novamente",
+                    auto_close_duration=5, button_color="#4169E1")
+
+
 def editar_perfil():
     sg.theme("DarkGrey16")
 
@@ -781,7 +854,7 @@ def editar_perfil():
         window.close()
         perfil()
     elif button == "Alterar senha":
-        nova_senha()
+        senha_nova(id)
     elif button == "Salvar alterações":
         try:
             conexao = sq.connect("programa/registro.db")
@@ -943,7 +1016,7 @@ def front2():
             key="-TABLE-", enable_events=True, size=(500, 10),
             auto_size_columns=False, col_widths=[14, 39],
             vertical_scroll_only=False, justification="l",
-            font=("Arial", 15))]
+            font=("Arial", 15), hide_vertical_scroll=True)]
     ]
 
     layout_despertador = [
