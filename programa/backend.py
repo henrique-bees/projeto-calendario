@@ -96,3 +96,11 @@ def ler_notas(id):
     resultado = cursor.fetchall()
     conexao.close()
     return resultado
+
+
+def criar_alarme(nome, data, nota, id):
+    conexao = sq.connect("programa/registro.db")
+    cursor = conexao.cursor()
+    cursor.execute("INSERT INTO alarmes (nome, data, nota, id_alarmes) VALUES (?, ?, ?, ?)", (nome, data, nota, id))
+    conexao.commit()
+    conexao.close()
