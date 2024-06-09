@@ -4,6 +4,7 @@ import sqlite3 as sq
 import time
 from datetime import datetime
 from random import choice
+import threading
 
 
 # Inserindo função de login
@@ -444,7 +445,8 @@ def relógio():
             window.close()
             temporizador()
         elif event == "Alarmes":
-            ""
+            window.close()
+            alarmes()
         # Atualizar a hora
         current_time = time.localtime()
         # Atualizar os dígitos individuais de horas, minutos e segundos
@@ -675,8 +677,183 @@ def temporizador():
             relógio()
 
 
+def alarm_function(alarm_time, alarm_name, alarm_message, days_of_week=None):
+    while True:
+        current_time = datetime.now()
+        if days_of_week:
+            # Verifica se o dia da semana atual está nos dias selecionados
+            if current_time.weekday() in days_of_week:
+                if current_time.time() >= alarm_time.time():
+                    sg.popup(f'Alarme: {alarm_name}', alarm_message, button_color="#4169E1")
+                    break
+        else:
+            if current_time >= alarm_time:
+                sg.popup(f'Alarme: {alarm_name}', alarm_message, button_color="#4169E1")
+                break
+        time.sleep(1)
+
+# Função para calcular o tempo restante
+def calculate_time_left(alarm_time):
+    current_time = datetime.now()
+    time_left = alarm_time - current_time
+    if time_left.total_seconds() < 0:
+        return (0, 0, 0)
+    hours, remainder = divmod(time_left.total_seconds(), 3600)
+    minutes, seconds = divmod(remainder, 60)
+    return int(hours), int(minutes), int(seconds)
+
+# Função principal
 def alarmes():
-    ""
+    sg.theme("DarkGrey16")
+    
+    layout_frame_button = [
+        [sg.Button("Adicionar", size=(7,2), button_color="#4169E1"),
+        sg.Button("Deletar", size=(7,2), button_color="#4169E1"), 
+        sg.Button("Voltar", size=(7,2), button_color="#4169E1")]
+    ]
+
+    frame_button = sg.Frame(None, layout_frame_button, size=(230, 50))
+    layout_frame_dh = [
+        [sg.Text("00", font=("Arial", 20), key='-DISPLAY_HOURS-')],
+    ]
+    layout_frame_dm = [
+        [sg.Text("00", font=("Arial", 20), key='-DISPLAY_MINUTES-')]
+    ]
+    layout_frame_ds = [
+        [sg.Text("00", font=("Arial", 20), key='-DISPLAY_SECONDS-')]
+    ]
+
+    layout_frame_temporizador = [
+        [sg.Column([
+            [sg.Frame(None, layout_frame_dh, size=(50, 50)),
+             sg.Text(":"),
+             sg.Frame(None, layout_frame_dm, size=(50, 50)),
+             sg.Text(":"),
+             sg.Frame(None, layout_frame_ds, size=(50, 50))]], expand_x=True, element_justification="center", pad=(0, 20, 0, 0))]
+    ]
+
+    frame_digito = sg.Frame(None, layout_frame_temporizador)
+
+    layout_frame_hora = [
+        [frame_digito]
+    ]
+
+    frame_hora = sg.Frame(None, layout_frame_hora, size=(230, 110))
+
+    layout_esquerda = [
+        [frame_button],
+        [sg.HorizontalSeparator()],
+        [sg.Text("Nome:", size=(10, 1), font=("Arial", 10)), sg.Input(key="-NOME-", size=(19,1))],
+        [sg.Checkbox("D", pad=(0,0), font=("Arial", 8), key="-MON-"),
+        sg.Checkbox("S", pad=(0,0), font=("Arial", 8), key="-TUE-"), 
+        sg.Checkbox("T", pad=(0,0), font=("Arial", 8), key="-WED-"), 
+        sg.Checkbox("Q", pad=(0,0), font=("Arial", 8), key="-THU-"), 
+        sg.Checkbox("Q", pad=(0,0), font=("Arial", 8), key="-FRI-"), 
+        sg.Checkbox("S", pad=(0,0), font=("Arial", 8), key="-SAT-"), 
+        sg.Checkbox("S", pad=(0,0), font=("Arial", 8), key="-SUN-")],
+        [sg.Text("Data:", size=(10, 1), font=("Arial", 10)), sg.Input(key="-DATA-", size=(12,1), disabled=True), sg.CalendarButton('Data', button_color="#4169E1", target='-DATA-', format='%Y-%m-%d')],
+        [sg.Text('Horas:', size=(10,1), font=("Arial", 10)), sg.Combo([f'{i:02d}' for i in range(24)], key='-HOUR-',size=(17,1))],
+        [sg.Text('Minutos:', size=(10,1), font=("Arial", 10)), sg.Combo([f'{i:02d}' for i in range(60)], key='-MINUTE-',size=(17,1))],
+        [sg.Text('Segundos:', size=(10,1), font=("Arial", 10)), sg.Combo([f'{i:02d}' for i in range(60)], key='-SECOND-', size=(17,1))],
+        [sg.Text("Nota:", size=(10, 1), font=("Arial", 10)), sg.Input(key="-NOTA-", size=(19,1))],
+        [sg.HorizontalSeparator()],
+        [frame_hora]
+    ]
+
+    layout_frame_alarmes = [
+        [sg.Text('Alarmes:', font=("Arial", 10), text_color="#4169E1")],
+        [sg.Listbox(values=[], key='-ALARMS-', size=(30, 400), enable_events=True, horizontal_scroll=True)]
+    ]
+
+    frame_alarmes = sg.Frame(None, layout_frame_alarmes)
+
+    layout_direita = [
+        [frame_alarmes]
+    ]
+
+    layout_global = [
+        [sg.Frame(None, [[sg.Column(layout_esquerda),sg.VerticalSeparator(), sg.Column(layout_direita)]], size=(510, 380))]
+    ]
+
+    window = sg.Window("Alarmes", layout_global, size=(510, 400))
+
+    alarm_set = False
+    alarm_time = None
+
+    while True:
+        event, values = window.read(timeout=1000)
+        
+        if event == sg.WINDOW_CLOSED:
+            exit()
+        
+        if event == "Adicionar":
+            date_str = values['-DATA-']
+            hour = values['-HOUR-']
+            minute = values['-MINUTE-']
+            second = values['-SECOND-']
+            name = values['-NOME-']
+            message = values['-NOTA-']
+            days_of_week = [i for i, key in enumerate(["-MON-", "-TUE-", "-WED-", "-THU-", "-FRI-", "-SAT-", "-SUN-"]) if values[key]]
+
+            if not hour or not minute or not second or not name or not message:
+                sg.popup('Por favor, preencha todos os campos!', button_color="#4169E1")
+                continue
+
+            elif not days_of_week and not date_str:
+                sg.popup('Por favor, selecione uma data ou dias da semana!', button_color="#4169E1")
+                continue
+
+            elif not days_of_week:
+                alarm_time_str = f"{date_str} {hour}:{minute}:{second}"
+                alarm_time = datetime.strptime(alarm_time_str, '%Y-%m-%d %H:%M:%S')
+                if alarm_time <= datetime.now():
+                    sg.popup('O horário do alarme deve estar no futuro!', button_color="#4169E1")
+                    continue
+            else:
+                alarm_time = datetime.now().replace(hour=int(hour), minute=int(minute), second=int(second), microsecond=0)
+                if alarm_time <= datetime.now():
+                    alarm_time += datetime.timedelta(days=1)
+
+            threading.Thread(target=alarm_function, args=(alarm_time, name, message, days_of_week), daemon=True).start()
+            alarm_set = True
+            sg.popup('Alarme configurado com sucesso!', button_color="#4169E1")
+
+            # Atualiza a lista de alarmes no frame direito
+            alarm_str = f"{name} - {alarm_time.strftime('%Y-%m-%d %H:%M:%S')}"
+            window['-ALARMS-'].update(values=window['-ALARMS-'].GetListValues() + [alarm_str])
+
+            
+
+        elif event == "Deletar":
+            selected_alarm_indices = values['-ALARMS-']
+            if selected_alarm_indices:
+                selected_alarm_index = selected_alarm_indices[0]  # Assume apenas um alarme selecionado por vez
+                alarms_list = window['-ALARMS-'].get_list_values()
+                alarm_str = selected_alarm_index.split(" - ")[0]  # Obter o nome do alarme da string selecionada
+                alarm_index = alarms_list.index(selected_alarm_index)  # Obter o índice do alarme na lista
+                del alarms_list[alarm_index]  # Remover o alarme da lista
+                window['-ALARMS-'].update(values=alarms_list)
+                sg.popup('Alarme removido com sucesso!', button_color="#4169E1")
+            else:
+                sg.popup('Selecione um alarme para deletar.', button_color="#4169E1")
+
+
+        elif event == "Voltar":
+            window.close()
+            relógio()
+
+        # Atualizar o display do tempo restante
+        if alarm_set and alarm_time:
+            hours, minutes, seconds = calculate_time_left(alarm_time)
+            window['-DISPLAY_HOURS-'].update(f'{hours:02d}')
+            window['-DISPLAY_MINUTES-'].update(f'{minutes:02d}')
+            window['-DISPLAY_SECONDS-'].update(f'{seconds:02d}')
+
+        # Desabilitar/habilitar campo de data baseado nas checkboxes
+        if any(values[key] for key in ["-MON-", "-TUE-", "-WED-", "-THU-", "-FRI-", "-SAT-", "-SUN-"]):
+            window['-DATA-'].update(disabled=True)
+        else:
+            window['-DATA-'].update(disabled=False)
 #   Inserindo uma função para a janela anotações
 
 
