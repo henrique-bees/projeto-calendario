@@ -1,7 +1,7 @@
 import sqlite3 as sq
 
 
-def criar(tipo, data, hora, titulo, id):
+def criar(tipo, data, titulo, id):
     conexao = sq.connect("programa/registro.db")
     cursor = conexao.cursor()
     try:
@@ -13,8 +13,8 @@ def criar(tipo, data, hora, titulo, id):
         else:
             index = 1
     finally:
-        query = f"INSERT INTO {tipo} (posição, data, hora, titulo, id_pins) VALUES (?, ?, ?, ?, ?)"
-        cursor.execute(query, (index, data, hora, titulo, id))
+        query = f"INSERT INTO {tipo} (posição, data, titulo, id_pins) VALUES (?, ?, ?, ?)"
+        cursor.execute(query, (index, data, titulo, id))
         conexao.commit()
         conexao.close()
         return index
@@ -34,14 +34,10 @@ def deletar(tipo, index, id):
 def ler_salvos(tipo, id):
     conexao = sq.connect("programa/registro.db")
     cursor = conexao.cursor()
-    query = f"SELECT posição, data, hora, titulo FROM {tipo} WHERE id_pins = ?"
+    query = f"SELECT posição, data, titulo FROM {tipo} WHERE id_pins = ?"
     cursor.execute(query, (id,))
-    resultado = cursor.fetchall()
+    conteudo = cursor.fetchall()
     conexao.close()
-    conteudo = []
-    for i in range(len(resultado)):
-        j = (resultado[i][0], resultado[i][1] + " - " + resultado[i][2], resultado[i][3])
-        conteudo.append(j)
     return conteudo
 
 
@@ -71,3 +67,14 @@ def verificar_registro(usuario):
             return "invalido"
         else:
             return "valido"
+
+
+def eventos_recentes(id):
+    conexao = sq.connect("programa/registro.db")
+    cursor = conexao.cursor()
+    cursor.execute(
+        "SELECT data, titulo FROM eventos WHERE id_pins = ? ORDER BY data",
+        (id,))
+    conteudo = cursor.fetchmany(3)
+    conexao.close()
+    return conteudo

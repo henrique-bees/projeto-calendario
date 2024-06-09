@@ -6,9 +6,6 @@ from datetime import datetime
 from random import choice
 
 
-
-
-
 # Inserindo função de login
 
 def login():
@@ -300,7 +297,7 @@ def eventos():
 
         # Criar a Tabela com index, data, nota
         # Headings são os titulos, col_widths são os tamanhos das colunas
-        [sg.Table(values=conteudo, headings=["Index", "Data", "Evento"],
+        [sg.Table(values=conteudo, headings=["Index", "Data / Hora", "Evento"],
                   key="-TABLE-", enable_events=True, size=(500, 10),
                   auto_size_columns=False, col_widths=[5, 14, 23],
                   vertical_scroll_only=True, justification="l",
@@ -332,14 +329,14 @@ def eventos():
         elif button == "Adicionar":
             titulo = values["-EVENTO-"]
             if titulo != "":
-                data = window["-DATA-"].get().split()[0]
+                data_selecionada = window["-DATA-"].get().split()[0]
                 hora = values["-HORA-"]
                 minuto = values["-MINUTO-"]
+                hora_selecionada = f"{hora}:{minuto}"
                 if hora != "" and minuto != "":
                     agora = datetime.now()
                     hora_atual = agora.strftime("%H:%M")
-                    hora_selecionada = f"{hora}:{minuto}"
-                    selected_date = datetime.strptime(data, '%Y-%m-%d').date()
+                    selected_date = datetime.strptime(data_selecionada, '%Y-%m-%d').date()
                     selected_hour = datetime.strptime(hora_selecionada,
                                                       '%H:%M')
                     current_hour = datetime.strptime(hora_atual, '%H:%M')
@@ -349,9 +346,9 @@ def eventos():
                             button_color="#4169E1")
                     else:
                         titulo = values["-EVENTO-"]
-                        c = bc.criar(tipo, data, hora_selecionada, titulo, id)
-                        nota = [(c, data + " - " + hora_selecionada,
-                                 values["-EVENTO-"])]
+                        data = data_selecionada + " / " + hora_selecionada
+                        c = bc.criar(tipo, data, titulo, id)
+                        nota = [(c, data, values["-EVENTO-"])]
                         conteudo += nota
                         window["-TABLE-"].update(conteudo)
                         window["-EVENTO-"].update("")
@@ -781,7 +778,7 @@ def editar_perfil():
         perfil()
     elif button == "Alterar senha":
         nova_senha()
-    elif button == "Salvar alterações":            
+    elif button == "Salvar alterações":
         usuario = values["-USUARIO-"]
         validez = bc.verificar_registro(usuario)
         nome = values["-NOME-"]
@@ -934,23 +931,10 @@ def front2():
                    pad=(13, 1))],
     ]
 
-    def eventos_recentes(id):
-        conexao = sq.connect("programa/registro.db")
-        cursor = conexao.cursor()
-        cursor.execute(
-            "SELECT data, hora, titulo FROM eventos WHERE id_pins = ? ORDER BY data",
-            (id,))
-        resultado = cursor.fetchmany(3)
-        conexao.close()
-        conteudo = []
-        for i in range(len(resultado)):
-            j = resultado[i][0] + " - " + resultado[i][1], resultado[i][2]
-            conteudo.append(j)
-        return conteudo
-
     layout_frame_proximos_eventos = [
         [sg.Table(
-            values=eventos_recentes(id), headings=("DATA | HORA", "PROXIMOS EVENTOS"),
+            values=bc.eventos_recentes(id),
+            headings=("DATA / HORA", "PROXIMOS EVENTOS"),
             key="-TABLE-", enable_events=True, size=(500, 10),
             auto_size_columns=False, col_widths=[14, 39],
             vertical_scroll_only=False, justification="l",
@@ -965,11 +949,6 @@ def front2():
 
     ]
 
-    layout_frame_historico = [
-
-    ]
-    frame_historico = sg.Frame(
-        "Histórico Geral", layout_frame_historico, size=(500, 100))
     frame_anotações = sg.Frame(
         "Anotações Recentes", layout_frame_anotações, size=(500, 100))
     frame_despertador = sg.Frame(
@@ -987,7 +966,6 @@ def front2():
         [frame_proximos_eventos],
         [frame_despertador],
         [frame_anotações],
-        [frame_historico],
         [sg.VPush()],
         [sg.Column([
             [sg.HorizontalSeparator()],
