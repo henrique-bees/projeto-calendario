@@ -1,11 +1,11 @@
 import sqlite3 as sq
 
 
-def criar(tipo, data, titulo, id):
+def criar_eventos(data, titulo, id):
     conexao = sq.connect("programa/registro.db")
     cursor = conexao.cursor()
     try:
-        query = f"SELECT MAX(posição) FROM {tipo} WHERE id_pins = ?"
+        query = "SELECT MAX(posição) FROM eventos WHERE id_pins = ?"
         cursor.execute(query, (id,))
         resultado = cursor.fetchone()[0]
         if resultado is not None:
@@ -13,28 +13,28 @@ def criar(tipo, data, titulo, id):
         else:
             index = 1
     finally:
-        query = f"INSERT INTO {tipo} (posição, data, titulo, id_pins) VALUES (?, ?, ?, ?)"
+        query = "INSERT INTO eventos (posição, data, titulo, id_pins) VALUES (?, ?, ?, ?)"
         cursor.execute(query, (index, data, titulo, id))
         conexao.commit()
         conexao.close()
         return index
 
 
-def deletar(tipo, index, id):
+def deletar_eventos(index, id):
     conexao = sq.connect("programa/registro.db")
     cursor = conexao.cursor()
-    query = f"DELETE FROM {tipo} WHERE posição = ? and id_pins = ?"
+    query = "DELETE FROM eventos WHERE posição = ? and id_pins = ?"
     cursor.execute(query, (index, id,))
-    query = f"UPDATE {tipo} SET posição = posição - 1 WHERE id_pins = ? AND posição > ?"
+    query = "UPDATE eventos SET posição = posição - 1 WHERE id_pins = ? AND posição > ?"
     cursor.execute(query, (id, index))
     conexao.commit()
     conexao.close()
 
 
-def ler_salvos(tipo, id):
+def ler_eventos(id):
     conexao = sq.connect("programa/registro.db")
     cursor = conexao.cursor()
-    query = f"SELECT posição, data, titulo FROM {tipo} WHERE id_pins = ?"
+    query = "SELECT posição, data, titulo FROM eventos WHERE id_pins = ?"
     cursor.execute(query, (id,))
     conteudo = cursor.fetchall()
     conexao.close()
@@ -78,3 +78,21 @@ def eventos_recentes(id):
     conteudo = cursor.fetchmany(3)
     conexao.close()
     return conteudo
+
+
+def criar_notas(titulo, nota, id):
+    conexao = sq.connect("programa/registro.db")
+    cursor = conexao.cursor()
+    cursor.execute(
+        "INSERT INTO notas (titulo, nota, id_notas) VALUES (?, ?, ?)", (titulo, nota, id))
+    conexao.commit()
+    conexao.close()
+
+
+def ler_notas(id):
+    conexao = sq.connect("programa/registro.db")
+    cursor = conexao.cursor()
+    cursor.execute("SELECT titulo, nota FROM notas WHERE id_notas = ?", (id,))
+    resultado = cursor.fetchall()
+    conexao.close()
+    return resultado

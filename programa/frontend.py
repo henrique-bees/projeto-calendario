@@ -277,8 +277,7 @@ def eventos():
     # Temas
     sg.theme("DarkGrey16")
     # Layout Interface
-    tipo = "eventos"
-    conteudo = bc.ler_salvos(tipo, id)
+    conteudo = bc.ler_eventos(id)
     layout = [
 
         # Botão de Calendário
@@ -336,7 +335,8 @@ def eventos():
                 if hora != "" and minuto != "":
                     agora = datetime.now()
                     hora_atual = agora.strftime("%H:%M")
-                    selected_date = datetime.strptime(data_selecionada, '%Y-%m-%d').date()
+                    selected_date = datetime.strptime(
+                        data_selecionada, '%Y-%m-%d').date()
                     selected_hour = datetime.strptime(hora_selecionada,
                                                       '%H:%M')
                     current_hour = datetime.strptime(hora_atual, '%H:%M')
@@ -347,7 +347,7 @@ def eventos():
                     else:
                         titulo = values["-EVENTO-"]
                         data = data_selecionada + " / " + hora_selecionada
-                        c = bc.criar(tipo, data, titulo, id)
+                        c = bc.criar_eventos(data, titulo, id)
                         nota = [(c, data, values["-EVENTO-"])]
                         conteudo += nota
                         window["-TABLE-"].update(conteudo)
@@ -363,8 +363,8 @@ def eventos():
         elif button == "-DEL-":
             if values["-TABLE-"]:
                 index = values["-TABLE-"][0] + 1
-                bc.deletar(tipo, index, id)
-                conteudo = bc.ler_salvos(tipo, id)
+                bc.deletar_eventos(index, id)
+                conteudo = bc.ler_eventos(id)
                 window["-TABLE-"].update(conteudo)
                 window["-EVENTO-"].update("")
 
@@ -592,7 +592,8 @@ def temporizador():
              sg.Frame(None, layout_frame_ds, size=(50, 50))]], expand_x=True, element_justification="center", pad=(0, 20, 0, 0))]
     ]
 
-    layout_temporizador = sg.Frame(None, layout_frame_temporizador, size=(350, 100))
+    layout_temporizador = sg.Frame(
+        None, layout_frame_temporizador, size=(350, 100))
 
     # Frame Global
     layout_frame_global = [
@@ -682,38 +683,52 @@ def alarmes():
 def anotações():
     # Temas
     sg.theme("DarkGrey16")
-    
+
     def create_note_window(note_name):
         layout = [
             [sg.Text(f"Anotações para {note_name}")],
             [sg.Multiline(size=(40, 10), key='-NOTE-')],
-            [sg.Button('Salvar', button_color="#4169E1"), sg.Button('Deletar', button_color="#4169E1"), sg.Button('Voltar', button_color="#4169E1")]
+            [sg.Button('Salvar', button_color="#4169E1"),
+             sg.Button('Deletar', button_color="#4169E1"),
+             sg.Button('Voltar', button_color="#4169E1")]
         ]
         return sg.Window(note_name, layout, modal=True)
-    
-    
+
     # Layout Interface
 
-
     layout_frame_buttons = [
-        [sg.Button("Adicionar", button_color="#4169E1", 
+        [sg.Button("Adicionar", button_color="#4169E1",
                    size=(10, 2), pad=(30, 2)),
-         sg.Button("Voltar", button_color="#4169E1", 
+         sg.Button("Voltar", button_color="#4169E1",
                    size=(10, 2), pad=(30, 2))]
     ]
     frame_buttons = sg.Frame(None, layout_frame_buttons, size=(400, 150))
 
-    
-    
     layout_frame_info = [
-        [sg.Text("Nome do Arquivo: ", font=("Arial", 10)), sg.Input(key='-BUTTON_NAME-')]
+        [sg.Text("Nome do Arquivo: ", font=("Arial", 10)),
+         sg.Input(key='-BUTTON_NAME-')]
     ]
-    frame_info = sg.Frame("Nova Nota", layout_frame_info, size=(400,50))
+    frame_info = sg.Frame("Nova Nota", layout_frame_info, size=(400, 50))
 
     layout_frame_salvos = [
         [sg.Column([], key='-BUTTON_LIST-')],
+        [sg.Listbox(values="", size=(400, 190), key='-LISTBOX-',
+                    select_mode=sg.LISTBOX_SELECT_MODE_SINGLE)]
     ]
-    frame_salvos = sg.Frame("Notas Salvas", layout_frame_salvos, size=(400, 190))
+    frame_salvos = sg.Frame(
+        "Notas Salvas", layout_frame_salvos, size=(400, 190))
+
+    window = sg.Window('Exemplo de Listbox com Duplo Clique')
+
+# Abrindo a janela antes de acessar o widget
+    window.finalize()
+
+    # Obtendo a referência do Listbox dentro do Frame
+    listbox_widget = window['-LISTBOX-'].Widget
+
+# Vinculando o evento de duplo clique ao Listbox
+    listbox_widget.bind(
+        '<Double-1>', lambda event: window.write_event_value('-LISTBOX-DOUBLE_CLICK', ''))
 
     layout_frame = [
         [frame_info],
@@ -727,7 +742,6 @@ def anotações():
 
     ]
 
-    
     # Info Janela
     window = sg.Window("Anotações", layout, size=(
         350, 340), element_justification=("left"))
@@ -738,16 +752,7 @@ def anotações():
         if event == sg.WINDOW_CLOSED:
             exit()
         elif event == "Adicionar":
-            button_name = values['-BUTTON_NAME-']
-            
-            # Verifica se o nome não está vazio e não é duplicado
-            if button_name and button_name not in button_names:
-                button_names.append(button_name)
-                
-                # Adiciona o novo botão na lista de botões
-                button = [sg.Button(button_name, key=button_name, button_color="#4169E1", size=(15,1))]
-                window.extend_layout(window['-BUTTON_LIST-'], [button])
-                window['-BUTTON_NAME-'].update('')  # Limpa o campo de entrada
+            bc.criar_notas()
         elif event in button_names:
             # Cria uma nova janela de anotações
             note_window = create_note_window(event)
@@ -765,9 +770,82 @@ def anotações():
             button_names.remove(button_name)
             window['-BUTTON_LIST-'].update('')
             for name in button_names:
-                button = [sg.Button(name, key=name, button_color="#4169E1", size=(15,1))]
+                button = [
+                    sg.Button(name, key=name, button_color="#4169E1", size=(15, 1))]
                 window.extend_layout(window['-BUTTON_LIST-'], [button])
-#   Inserindo janela de edição de perfil
+
+
+def senha_nova(id):
+    sg.theme("DarkGrey16")
+    frame = [
+        [sg.T("Senha Atual:      "),
+         sg.I(key="-SENHAA-")],
+        [sg.HorizontalSeparator()],
+        [sg.T("Senha:               "),
+         sg.I(key="-SENHA-", password_char="*", size=(29, 2)), sg.Button("👁", key="-SHOW_PASSWORD-",
+                                                                         border_width=0, button_color=("#343434"))],
+        [sg.T("Confirmar Senha:"), sg.I(key="-SENHA2-", password_char="*", size=(29, 2)),
+         sg.Button("👁", key="-SHOW_CONFIRM_PASSWORD-", border_width=0, button_color=("#343434"))],
+    ]
+    layout = [
+        [sg.Frame("Nova Senha", frame)],
+        [sg.Ok(button_color="#4169E1", size=(10, 1)), sg.B(
+            "Voltar", button_color="#4169E1", size=(10, 1))],
+    ]
+    window = sg.Window("Recuperação de senha", layout, size=(400, 165))
+    while True:
+        event, values = window.read()
+        if event == sg.WINDOW_CLOSED:
+            quit()
+        elif event == "-SHOW_PASSWORD-":
+            password_input = window['-SENHA-']
+            if password_input.Widget.cget("show") == "*":
+                password_input.Widget.config(show="")
+            else:
+                password_input.Widget.config(show="*")
+        elif event == "-SHOW_CONFIRM_PASSWORD-":
+            password_input2 = window['-SENHA2-']
+            if password_input2.Widget.cget("show") == "*":
+                password_input2.Widget.config(show="")
+            else:
+                password_input2.Widget.config(show="*")
+        elif event == "Voltar":
+            window.close()
+            editar_perfil()
+        elif event == "Ok":
+            senha_atual = values["-SENHAA-"]
+            senha = values["-SENHA-"]
+            senha2 = values["-SENHA2-"]
+            if senha == senha2:
+                valido = bc.verificar_senha(senha)
+                if valido:
+                    conexao = sq.connect("programa/registro.db")
+                    cursor = conexao.cursor()
+                    cursor.execute(
+                        "SELECT nome, senha FROM usuarios WHERE id = ?", (id,))
+                    usuario = cursor.fetchone()
+                    if senha_atual == usuario[1]:
+                        cursor.execute(
+                            "UPDATE usuarios SET senha = ? WHERE nome = ?",
+                            (senha, usuario[0]))
+                        conexao.commit()
+                        conexao.close()
+                        window.close()
+                        sg.popup_timed("A nova senha foi cadastrada com sucesso!",
+                                       auto_close_duration=5, button_color="#4169E1")
+                        login()
+                    else:
+                        sg.popup_timed("A senha atual é invalida",
+                                       auto_close_duration=5, burron_color="#4169E1")
+                else:
+                    sg.popup_timed("A senha não preenche os requisitos de senha forte. Sua"
+                                   " senha precisa conter pelo menos: 1 letra maiúscula, 1 letra minúscula,"
+                                   " 1 número e 1 caractére especial. Além de conter no mínimo 8 caractéres"
+                                   " e no máximo 16", auto_close_duration=5, button_color="#4169E1")
+            else:
+                sg.popup_timed(
+                    "As senhas não coincidem, por favor, tente novamente",
+                    auto_close_duration=5, button_color="#4169E1")
 
 
 def editar_perfil():
@@ -808,7 +886,7 @@ def editar_perfil():
         window.close()
         perfil()
     elif button == "Alterar senha":
-        nova_senha()
+        senha_nova(id)
     elif button == "Salvar alterações":
         usuario = values["-USUARIO-"]
         validez = bc.verificar_registro(usuario)
@@ -969,7 +1047,7 @@ def front2():
             key="-TABLE-", enable_events=True, size=(500, 10),
             auto_size_columns=False, col_widths=[14, 39],
             vertical_scroll_only=False, justification="l",
-            font=("Arial", 15))]
+            font=("Arial", 15), hide_vertical_scroll=True)]
     ]
 
     layout_despertador = [
