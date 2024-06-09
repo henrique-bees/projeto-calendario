@@ -386,7 +386,7 @@ def relógio():
     buttons_layout = [
         [sg.Button("Cronômetro", button_color="#4169E1", size=(11, 2)),
          sg.Button("Temporizador", button_color="#4169E1", size=(11, 2)),
-         sg.Button("Despertador", button_color="#4169E1", size=(11, 2))]
+         sg.Button("Alarmes", button_color="#4169E1", size=(11, 2))]
     ]
     buttons_frame = sg.Frame(None, buttons_layout,
                              size=(320, 50), relief='sunken')
@@ -443,7 +443,7 @@ def relógio():
         elif event == "Temporizador":
             window.close()
             temporizador()
-        elif event == "Despetador":
+        elif event == "Alarmes":
             ""
         # Atualizar a hora
         current_time = time.localtime()
@@ -592,8 +592,7 @@ def temporizador():
              sg.Frame(None, layout_frame_ds, size=(50, 50))]], expand_x=True, element_justification="center", pad=(0, 20, 0, 0))]
     ]
 
-    layout_temporizador = sg.Frame(
-        None, layout_frame_temporizador, size=(350, 100))
+    layout_temporizador = sg.Frame(None, layout_frame_temporizador, size=(350, 100))
 
     # Frame Global
     layout_frame_global = [
@@ -675,7 +674,7 @@ def temporizador():
             relógio()
 
 
-def despertador():
+def alarmes():
     ""
 #   Inserindo uma função para a janela anotações
 
@@ -683,59 +682,91 @@ def despertador():
 def anotações():
     # Temas
     sg.theme("DarkGrey16")
+    
+    def create_note_window(note_name):
+        layout = [
+            [sg.Text(f"Anotações para {note_name}")],
+            [sg.Multiline(size=(40, 10), key='-NOTE-')],
+            [sg.Button('Salvar', button_color="#4169E1"), sg.Button('Deletar', button_color="#4169E1"), sg.Button('Voltar', button_color="#4169E1")]
+        ]
+        return sg.Window(note_name, layout, modal=True)
+    
+    
     # Layout Interface
 
-    frame_layout = [
+
+    layout_frame_buttons = [
+        [sg.Button("Adicionar", button_color="#4169E1", 
+                   size=(10, 2), pad=(30, 2)),
+         sg.Button("Voltar", button_color="#4169E1", 
+                   size=(10, 2), pad=(30, 2))]
+    ]
+    frame_buttons = sg.Frame(None, layout_frame_buttons, size=(400, 150))
+
+    
+    
+    layout_frame_info = [
+        [sg.Text("Nome do Arquivo: ", font=("Arial", 10)), sg.Input(key='-BUTTON_NAME-')]
+    ]
+    frame_info = sg.Frame("Nova Nota", layout_frame_info, size=(400,50))
+
+    layout_frame_salvos = [
+        [sg.Column([], key='-BUTTON_LIST-')],
+    ]
+    frame_salvos = sg.Frame("Notas Salvas", layout_frame_salvos, size=(400, 190))
+
+    layout_frame = [
+        [frame_info],
+        [frame_salvos],
         [sg.VPush()],
-        [sg.Button("Adicionar", button_color="#4169E1", size=(10, 2), pad=(16, 1)),
-         sg.Button("Deletar", button_color="#4169E1",
-                   size=(10, 2), pad=(16, 2)),
-         sg.Button("Voltar", button_color="#4169E1", size=(10, 2), pad=(16, 2))]
+        [sg.HorizontalSeparator()],
+        [frame_buttons],
     ]
-
     layout = [
-        [sg.Frame(None, frame_layout, size=(400, 400))]
+        [sg.Frame(None, layout_frame, size=(400, 450))]
 
     ]
 
+    
     # Info Janela
-    window = sg.Window("Tarefas", layout, size=(
-        400, 400), element_justification=("left"))
+    window = sg.Window("Anotações", layout, size=(
+        350, 340), element_justification=("left"))
 
-    button, values = window.read()
-
-    if button == sg.WINDOW_CLOSED:
-        window.close()
-        exit()
-    elif button == "Adicionar":
-        window.close()
-
-        def novo_texto():
-            frame_layout = [
-
-                [sg.Text("Nome do texto: ", font=("Arial", 10)),
-                 sg.Input(key="-TAG-")],
-                [sg.HorizontalSeparator()],
-                [sg.Button("Salvar", button_color="#4169E1", size=(10, 1), pad=(23, 2)),
-                 sg.Button("Cancelar", button_color="#4169E1", size=(10, 1), pad=(20, 2))]
-            ]
-
-            layout = [
-                [sg.Frame("Criar novo texto", frame_layout, size=(300, 200))]
-            ]
-
-            window = sg.Window("Novo Texto", layout, size=(300, 200))
-            button, values = window.read()
-
-            # """elif button == "Deletar":"""
-            if button == sg.WINDOW_CLOSED:
-                window.close()
-                exit()
-            elif button == "Voltar":
-                window.close()
-                front2()
-        novo_texto()
-
+    button_names = []
+    while True:
+        event, values = window.read()
+        if event == sg.WINDOW_CLOSED:
+            exit()
+        elif event == "Adicionar":
+            button_name = values['-BUTTON_NAME-']
+            
+            # Verifica se o nome não está vazio e não é duplicado
+            if button_name and button_name not in button_names:
+                button_names.append(button_name)
+                
+                # Adiciona o novo botão na lista de botões
+                button = [sg.Button(button_name, key=button_name, button_color="#4169E1", size=(15,1))]
+                window.extend_layout(window['-BUTTON_LIST-'], [button])
+                window['-BUTTON_NAME-'].update('')  # Limpa o campo de entrada
+        elif event in button_names:
+            # Cria uma nova janela de anotações
+            note_window = create_note_window(event)
+            while True:
+                note_event, note_values = note_window.read()
+                if note_event in (sg.WINDOW_CLOSED, 'Voltar'):
+                    note_window.close()
+                    break
+        elif event == "Voltar":
+            window.close()
+            front2()
+        elif event == 'Deletar':
+            # Remover o botão da lista de botões e atualizar o layout
+            button_name = values['-BUTTON_NAME-']
+            button_names.remove(button_name)
+            window['-BUTTON_LIST-'].update('')
+            for name in button_names:
+                button = [sg.Button(name, key=name, button_color="#4169E1", size=(15,1))]
+                window.extend_layout(window['-BUTTON_LIST-'], [button])
 #   Inserindo janela de edição de perfil
 
 
