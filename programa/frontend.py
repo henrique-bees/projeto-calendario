@@ -305,7 +305,7 @@ def eventos():
 
         # Criar coluna, inserir botões de adicionar e deletar, dar keys a eles.
         [sg.Column([
-            [sg.B("Adicionar", size=(20, 2), button_color="#4169E1"),
+            [sg.B("Adicionar", size=(20, 2), button_color="#4169E1", bind_return_key=True),
              sg.B("Deletar", size=(20, 2), button_color="#4169E1",
                   key="-DEL-"), sg.Button("Voltar para página anterior",
                                           size=(20, 2),
@@ -364,7 +364,7 @@ def eventos():
         elif button == "-DEL-":
             if values["-TABLE-"]:
                 index = values["-TABLE-"][0] + 1
-                bc.deletar_eventos(index, id)
+                bc.deletar(tipo, index, id)
                 conteudo = bc.ler_eventos(id)
                 window["-TABLE-"].update(conteudo)
                 window["-EVENTO-"].update("")
@@ -400,7 +400,8 @@ def relógio():
                                       key='-MINUTOS_DIGITS-')]], size=(64, 60), relief='ridge'),
              sg.Text(":", font=("Arial", 20)),
              sg.Frame(None, [[sg.Text("00", font=("Arial", 30), key='-SEGUNDOS_DIGITS-')]], size=(64, 60), relief='ridge')]],
-            expand_x=True, pad=(15, 15, 15, 0))]  # Reduziu a distância superior da coluna
+            # Reduziu a distância superior da coluna
+            expand_x=True, pad=(15, 15, 15, 0))]
     ]
     frame_hora = sg.Frame(None, frame_layout_hora)
 
@@ -479,7 +480,8 @@ def cronômetro():
                  "Arial", 30), key='-MINUTOS_DIGITS-')]], size=(64, 60), relief='ridge'),
              sg.Text(":", font=("Arial", 20)),
              sg.Frame(None, [[sg.Text("00", font=("Arial", 30), key='-SEGUNDOS_DIGITS-')]], size=(64, 60), relief='ridge')]],
-            expand_x=True, pad=(15, 15, 15, 0))]  # Reduziu a distância superior da coluna
+            # Reduziu a distância superior da coluna
+            expand_x=True, pad=(15, 15, 15, 0))]
     ]
     frame_hora = sg.Frame(None, frame_layout_hora)
 
@@ -507,7 +509,7 @@ def cronômetro():
         [frame_global_layout]
     ]
 
-    window = sg.Window("Cronômetro", layout, size=(370, 310))
+    window = sg.Window("Cronômetro", layout, size=(370, 310), return_keyboard_events=True)
 
     # Variáveis de controle do cronômetro
     start_time = 0
@@ -537,6 +539,12 @@ def cronômetro():
             window['-HORAS_DIGITS-'].update('00')
             window['-MINUTOS_DIGITS-'].update('00')
             window['-SEGUNDOS_DIGITS-'].update('00')
+        elif not running and event == ' ':
+            window['-START-'].click()
+        elif event == 'Escape':
+            window["-RESET-"].click()
+        elif running and event == ' ':
+            window['-PAUSE-'].click()
 
         elif running:
             elapsed_time = time.time() - start_time
@@ -758,25 +766,23 @@ def alarmes():
          sg.Checkbox("Q", pad=(0, 0), font=("Arial", 8), key="-FRI-"),
          sg.Checkbox("S", pad=(0, 0), font=("Arial", 8), key="-SAT-"),
          sg.Checkbox("S", pad=(0, 0), font=("Arial", 8), key="-SUN-")],
-        [sg.Text("Data:", size=(10, 1), font=("Arial", 10)),
-         sg.Multiline(disabled=True, no_scrollbar=True,
-                      key="-DATA-", size=(12, 1)),
-         sg.CalendarButton('Data', button_color="#4169E1", target='-DATA-', key='-BOTAODATA-', format='%Y-%m-%d')],
+        [sg.Text("Data:", size=(10, 1), font=("Arial", 10)), sg.Multiline(key="-DATA-", size=(12, 1), disabled=True, no_scrollbar=True),
+         sg.CalendarButton('Data', button_color="#4169E1", key='-BOTAODATA-', target='-DATA-', format='%Y-%m-%d')],
         [sg.Text('Horas:', size=(10, 1), font=("Arial", 10)), sg.Combo(
-            [f'{i:02d}' for i in range(24)], key='-HOUR-', size=(17, 1), readonly=True)],
+            [f'{i:02d}' for i in range(24)], readonly=True, key='-HOUR-', size=(17, 1))],
         [sg.Text('Minutos:', size=(10, 1), font=("Arial", 10)), sg.Combo(
-            [f'{i:02d}' for i in range(60)], key='-MINUTE-', size=(17, 1), readonly=True)],
+            [f'{i:02d}' for i in range(60)], readonly=True, key='-MINUTE-', size=(17, 1))],
         [sg.Text('Segundos:', size=(10, 1), font=("Arial", 10)), sg.Combo(
-            [f'{i:02d}' for i in range(60)], key='-SECOND-', size=(17, 1), readonly=True)],
+            [f'{i:02d}' for i in range(60)], readonly=True, key='-SECOND-', size=(17, 1))],
         [sg.Text("Nota:", size=(10, 1), font=("Arial", 10)),
          sg.Input(key="-NOTA-", size=(19, 1))],
         [sg.HorizontalSeparator()],
         [frame_hora]
     ]
-    alarmes = bc.ler_alarmes(id)
+
     layout_frame_alarmes = [
         [sg.Text('Alarmes:', font=("Arial", 10), text_color="#4169E1")],
-        [sg.Listbox(values=alarmes, key='-ALARMS-', size=(30, 400),
+        [sg.Listbox(values=[], key='-ALARMS-', size=(30, 400),
                     enable_events=True, horizontal_scroll=True)]
     ]
 
@@ -811,10 +817,7 @@ def alarmes():
             message = values['-NOTA-']
             days_of_week = [i for i, key in enumerate(
                 ["-MON-", "-TUE-", "-WED-", "-THU-", "-FRI-", "-SAT-", "-SUN-"]) if values[key]]
-            if date_str:
-                data = hour + ":" + minute + ":" + second + "/" + date_str
-            else:
-                data = hour + ":" + minute + ":" + second, days_of_week
+
             if not hour or not minute or not second or not name or not message:
                 sg.popup('Por favor, preencha todos os campos!',
                          button_color="#4169E1")
@@ -834,22 +837,26 @@ def alarmes():
                              button_color="#4169E1")
                     continue
             else:
-                try:
-                    alarm_time = datetime.now().replace(hour=int(hour), minute=int(minute),
-                                                        second=int(second), microsecond=0)
-                    if alarm_time <= datetime.now():
-                        alarm_time += datetime.timedelta(days=1)
-                finally:
-                    threading.Thread(target=alarm_function, args=(
-                        alarm_time, name, message, days_of_week), daemon=True).start()
-                    alarm_set = True
-                    sg.popup('Alarme configurado com sucesso!',
-                             button_color="#4169E1")
-                    bc.criar_alarme(name, data, message, id)
+                alarm_time = datetime.now().replace(hour=int(hour), minute=int(minute),
+                                                    second=int(second), microsecond=0)
+                if alarm_time <= datetime.now():
+                    alarm_time += datetime.timedelta(days=1)
 
-                    # Atualiza a lista de alarmes no frame direito
-                    alarm_str = bc.ler_alarmes(name, data, message, id)
-                    window['-ALARMS-'].update(alarm_str)
+            threading.Thread(target=alarm_function, args=(
+                alarm_time, name, message, days_of_week), daemon=True).start()
+            alarm_set = True
+            sg.popup('Alarme configurado com sucesso!', button_color="#4169E1")
+            window["-DATA-"].update('')
+            window['-DATA-'].update('')
+            window['-HOUR-'].update('')
+            window['-MINUTE-'].update('')
+            window['-SECOND-'].update('')
+            window['-NOME-'].update('')
+            window['-NOTA-'].update('')
+            # Atualiza a lista de alarmes no frame direito
+            alarm_str = f"{name} - {alarm_time.strftime('%Y-%m-%d %H:%M:%S')}"
+            window['-ALARMS-'].update(
+                values=window['-ALARMS-'].GetListValues() + [alarm_str])
 
         elif event == "Deletar":
             selected_alarm_indices = values['-ALARMS-']
@@ -893,13 +900,12 @@ def anotações():
     # Temas
     sg.theme("DarkGrey16")
 
-    def create_note_window(note_name):
+    def editar_nota(note_name):
         layout = [
             [sg.Text(f"Anotações para {note_name}")],
-            [sg.Multiline(size=(40, 10), key='-NOTE-')],
-            [sg.Button('Salvar', button_color="#4169E1"),
-             sg.Button('Deletar', button_color="#4169E1"),
-             sg.Button('Voltar', button_color="#4169E1")]
+            [sg.Multiline(size=(40, 10), key='-ANOTAÇÃO-')],
+            [sg.Button('Salvar', button_color="#4169E1"), sg.Button(
+                'Deletar', button_color="#4169E1"), sg.Button('Voltar', button_color="#4169E1")]
         ]
         return sg.Window(note_name, layout, modal=True)
 
@@ -915,29 +921,16 @@ def anotações():
 
     layout_frame_info = [
         [sg.Text("Nome do Arquivo: ", font=("Arial", 10)),
-         sg.Input(key='-BUTTON_NAME-')]
+         sg.Input(key='-NOMENOTA-')]
     ]
     frame_info = sg.Frame("Nova Nota", layout_frame_info, size=(400, 50))
 
     layout_frame_salvos = [
-        [sg.Column([], key='-BUTTON_LIST-')],
-        [sg.Listbox(values="", size=(400, 190), key='-LISTBOX-',
-                    select_mode=sg.LISTBOX_SELECT_MODE_SINGLE)]
+        [sg.Column([], key='-BUTTON_LIST-'),
+         sg.Listbox(values="", size=(400, 190), sbar_arrow_color="#4169E1")],
     ]
     frame_salvos = sg.Frame(
         "Notas Salvas", layout_frame_salvos, size=(400, 190))
-
-    window = sg.Window('Exemplo de Listbox com Duplo Clique')
-
-# Abrindo a janela antes de acessar o widget
-    window.finalize()
-
-    # Obtendo a referência do Listbox dentro do Frame
-    listbox_widget = window['-LISTBOX-'].Widget
-
-# Vinculando o evento de duplo clique ao Listbox
-    listbox_widget.bind(
-        '<Double-1>', lambda event: window.write_event_value('-LISTBOX-DOUBLE_CLICK', ''))
 
     layout_frame = [
         [frame_info],
@@ -961,15 +954,21 @@ def anotações():
         if event == sg.WINDOW_CLOSED:
             exit()
         elif event == "Adicionar":
-            bc.criar_notas()
+            nome_nota = values['-NOMENOTA-']
+            if nome_nota != '':
+                note_window = editar_nota(nome_nota)
+                while True:
+                    note_event, note_values = note_window[0].read()
+                    nota = values["-ANOTAÇÃO-"]
+                    bc.criar_notas(nome_nota, nota, id)
+                    if note_event in (sg.WINDOW_CLOSED, 'Voltar'):
+                        note_window[0].close()
+                        break
+                nota = note_window[1]
+                bc.criar_notas(nome_nota, nota, id)
         elif event in button_names:
             # Cria uma nova janela de anotações
-            note_window = create_note_window(event)
-            while True:
-                note_event, note_values = note_window.read()
-                if note_event in (sg.WINDOW_CLOSED, 'Voltar'):
-                    note_window.close()
-                    break
+            note_window = editar_nota(event)
         elif event == "Voltar":
             window.close()
             front2()
@@ -982,6 +981,7 @@ def anotações():
                 button = [
                     sg.Button(name, key=name, button_color="#4169E1", size=(15, 1))]
                 window.extend_layout(window['-BUTTON_LIST-'], [button])
+#   Inserindo janela de edição de perfil
 
 
 def senha_nova(id):
@@ -1143,7 +1143,6 @@ def perfil():
     resultado = cursor.fetchone()
     cursor.execute("SELECT nome FROM usuarios WHERE id = ?", (id,))
     resultado1 = cursor.fetchone()
-    print(resultado)
     if resultado is None:
         resultado = ("", "", "")
     conexao.close()
@@ -1256,7 +1255,7 @@ def front2():
             key="-TABLE-", enable_events=True, size=(500, 10),
             auto_size_columns=False, col_widths=[14, 39],
             vertical_scroll_only=False, justification="l",
-            font=("Arial", 15), hide_vertical_scroll=True)]
+            font=("Arial", 15))]
     ]
 
     layout_despertador = [
