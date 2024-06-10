@@ -759,7 +759,8 @@ def alarmes():
          sg.Checkbox("S", pad=(0, 0), font=("Arial", 8), key="-SAT-"),
          sg.Checkbox("S", pad=(0, 0), font=("Arial", 8), key="-SUN-")],
         [sg.Text("Data:", size=(10, 1), font=("Arial", 10)),
-         sg.Multiline(disabled=True, no_scrollbar=True, key="-DATA-", size=(12, 1)),
+         sg.Multiline(disabled=True, no_scrollbar=True,
+                      key="-DATA-", size=(12, 1)),
          sg.CalendarButton('Data', button_color="#4169E1", target='-DATA-', key='-BOTAODATA-', format='%Y-%m-%d')],
         [sg.Text('Horas:', size=(10, 1), font=("Arial", 10)), sg.Combo(
             [f'{i:02d}' for i in range(24)], key='-HOUR-', size=(17, 1), readonly=True)],
@@ -772,10 +773,10 @@ def alarmes():
         [sg.HorizontalSeparator()],
         [frame_hora]
     ]
-
+    alarmes = bc.ler_alarmes(id)
     layout_frame_alarmes = [
         [sg.Text('Alarmes:', font=("Arial", 10), text_color="#4169E1")],
-        [sg.Listbox(values=[], key='-ALARMS-', size=(30, 400),
+        [sg.Listbox(values=alarmes, key='-ALARMS-', size=(30, 400),
                     enable_events=True, horizontal_scroll=True)]
     ]
 
@@ -810,7 +811,10 @@ def alarmes():
             message = values['-NOTA-']
             days_of_week = [i for i, key in enumerate(
                 ["-MON-", "-TUE-", "-WED-", "-THU-", "-FRI-", "-SAT-", "-SUN-"]) if values[key]]
-            data = date_str + "/" + hour + ":" + minute + ":" + second
+            if date_str:
+                data = hour + ":" + minute + ":" + second + "/" + date_str
+            else:
+                data = hour + ":" + minute + ":" + second, days_of_week
             if not hour or not minute or not second or not name or not message:
                 sg.popup('Por favor, preencha todos os campos!',
                          button_color="#4169E1")
@@ -830,21 +834,22 @@ def alarmes():
                              button_color="#4169E1")
                     continue
             else:
-                alarm_time = datetime.now().replace(hour=int(hour), minute=int(minute),
-                                                    second=int(second), microsecond=0)
-                if alarm_time <= datetime.now():
-                    alarm_time += datetime.timedelta(days=1)
+                try:
+                    alarm_time = datetime.now().replace(hour=int(hour), minute=int(minute),
+                                                        second=int(second), microsecond=0)
+                    if alarm_time <= datetime.now():
+                        alarm_time += datetime.timedelta(days=1)
+                finally:
+                    threading.Thread(target=alarm_function, args=(
+                        alarm_time, name, message, days_of_week), daemon=True).start()
+                    alarm_set = True
+                    sg.popup('Alarme configurado com sucesso!',
+                             button_color="#4169E1")
+                    bc.criar_alarme(name, data, message, id)
 
-            threading.Thread(target=alarm_function, args=(
-                alarm_time, name, message, days_of_week), daemon=True).start()
-            alarm_set = True
-            sg.popup('Alarme configurado com sucesso!', button_color="#4169E1")
-            bc.criar_alarme(name, data, message, id)
-
-            # Atualiza a lista de alarmes no frame direito
-            alarm_str = f"{name} - {alarm_time.strftime('%Y-%m-%d %H:%M:%S')}"
-            window['-ALARMS-'].update(
-                values=window['-ALARMS-'].GetListValues() + [alarm_str])
+                    # Atualiza a lista de alarmes no frame direito
+                    alarm_str = bc.ler_alarmes(name, data, message, id)
+                    window['-ALARMS-'].update(alarm_str)
 
         elif event == "Deletar":
             selected_alarm_indices = values['-ALARMS-']

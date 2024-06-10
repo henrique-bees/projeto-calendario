@@ -104,3 +104,12 @@ def criar_alarme(nome, data, nota, id):
     cursor.execute("INSERT INTO alarmes (nome, data, nota, id_alarmes) VALUES (?, ?, ?, ?)", (nome, data, nota, id))
     conexao.commit()
     conexao.close()
+
+
+def ler_alarmes(id):
+    conexao = sq.connect("programa/registro.db")
+    cursor = conexao.cursor()
+    cursor.execute("SELECT nome, data, nota FROM alarmes WHERE id_alarmes = ? ORDER BY data", (id,))
+    resultado = cursor.fetchone()
+    conexao.close()
+    return resultado
