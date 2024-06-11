@@ -89,19 +89,46 @@ def criar_notas(titulo, nota, id):
     conexao.close()
 
 
-def ler_notas(id):
+def mostrar_notas(id):
     conexao = sq.connect("programa/registro.db")
     cursor = conexao.cursor()
-    cursor.execute("SELECT titulo, nota FROM notas WHERE id_notas = ?", (id,))
+    cursor.execute("SELECT titulo FROM notas WHERE id_notas = ?", (id,))
     resultado = cursor.fetchall()
     conexao.close()
     return resultado
 
 
+def ler_nota(titulo, id):
+    conexao = sq.connect("programa/registro.db")
+    cursor = conexao.cursor()
+    cursor.execute("SELECT nota FROM notas WHERE titulo = ? and id_notas = ?", (titulo, id))
+    resultado = cursor.fetchone()
+    conexao.close()
+    return resultado[0]
+
+
+def modificar_nota(nota, titulo, id):
+    conexao = sq.connect("programa/registro.db")
+    cursor = conexao.cursor()
+    cursor.execute(
+        "UPDATE notas SET nota = ? WHERE titulo = ? and id_notas = ?", (nota, titulo, id))
+    conexao.commit()
+    conexao.close()
+
+
+def deletar_nota(titulo, id):
+    conexao = sq.connect("programa/registro.db")
+    cursor = conexao.cursor()
+    cursor.execute("DELETE FROM notas WHERE titulo = ? and id_notas = ?", (titulo, id))
+    conexao.commit()
+    conexao.close()
+
+
 def criar_alarme(nome, data, nota, id):
     conexao = sq.connect("programa/registro.db")
     cursor = conexao.cursor()
-    cursor.execute("INSERT INTO alarmes (nome, data, nota, id_alarmes) VALUES (?, ?, ?, ?)", (nome, data, nota, id))
+    cursor.execute(
+        "INSERT INTO alarmes (nome, data, nota, id_alarmes) VALUES (?, ?, ?, ?)", (nome, data, nota, id))
     conexao.commit()
     conexao.close()
 
@@ -109,7 +136,8 @@ def criar_alarme(nome, data, nota, id):
 def ler_alarmes(id):
     conexao = sq.connect("programa/registro.db")
     cursor = conexao.cursor()
-    cursor.execute("SELECT nome, data, nota FROM alarmes WHERE id_alarmes = ? ORDER BY data", (id,))
+    cursor.execute(
+        "SELECT nome, data, nota FROM alarmes WHERE id_alarmes = ? ORDER BY data", (id,))
     resultado = cursor.fetchone()
     conexao.close()
     return resultado

@@ -509,7 +509,8 @@ def cronômetro():
         [frame_global_layout]
     ]
 
-    window = sg.Window("Cronômetro", layout, size=(370, 310), return_keyboard_events=True)
+    window = sg.Window("Cronômetro", layout, size=(
+        370, 310), return_keyboard_events=True)
 
     # Variáveis de controle do cronômetro
     start_time = 0
@@ -900,10 +901,10 @@ def anotações():
     # Temas
     sg.theme("DarkGrey16")
 
-    def editar_nota(note_name):
+    def editar_nota(note_name, nota=""):
         layout = [
             [sg.Text(f"Anotações para {note_name}")],
-            [sg.Multiline(size=(40, 10), key='-ANOTAÇÃO-')],
+            [sg.Multiline(default_text=nota,size=(40, 10), key='-ANOTAÇÃO-')],
             [sg.Button('Salvar', button_color="#4169E1"), sg.Button(
                 'Deletar', button_color="#4169E1"), sg.Button('Voltar', button_color="#4169E1")]
         ]
@@ -913,7 +914,7 @@ def anotações():
 
     layout_frame_buttons = [
         [sg.Button("Adicionar", button_color="#4169E1",
-                   size=(10, 2), pad=(30, 2)),
+                   size=(10, 2), pad=(30, 2), bind_return_key=True),
          sg.Button("Voltar", button_color="#4169E1",
                    size=(10, 2), pad=(30, 2))]
     ]
@@ -925,9 +926,12 @@ def anotações():
     ]
     frame_info = sg.Frame("Nova Nota", layout_frame_info, size=(400, 50))
 
+    notas_salvas = bc.mostrar_notas(id)
+
     layout_frame_salvos = [
         [sg.Column([], key='-BUTTON_LIST-'),
-         sg.Listbox(values="", size=(400, 190), sbar_arrow_color="#4169E1")],
+         sg.Listbox(values=notas_salvas, size=(400, 190), sbar_arrow_color="#4169E1",
+                    select_mode=sg.LISTBOX_SELECT_MODE_SINGLE, key="-LISTA-")],
     ]
     frame_salvos = sg.Frame(
         "Notas Salvas", layout_frame_salvos, size=(400, 190))
@@ -946,44 +950,75 @@ def anotações():
 
     # Info Janela
     window = sg.Window("Anotações", layout, size=(
-        350, 340), element_justification=("left"))
+        350, 340), element_justification=("left"), )
 
-    button_names = []
+    window.finalize()
+
+    window['-LISTA-'].Widget.bind('<Double-1>',
+                                  lambda event: window.write_event_value('-LISTBOX-DOUBLE_CLICK', ''))
     while True:
         event, values = window.read()
         if event == sg.WINDOW_CLOSED:
             exit()
         elif event == "Adicionar":
             nome_nota = values['-NOMENOTA-']
-            if nome_nota != '':
-                note_window = editar_nota(nome_nota)
-                while True:
-                    note_event, note_values = note_window[0].read()
-                    nota = values["-ANOTAÇÃO-"]
-                    bc.criar_notas(nome_nota, nota, id)
-                    if note_event in (sg.WINDOW_CLOSED, 'Voltar'):
-                        note_window[0].close()
-                        break
-                nota = note_window[1]
-                bc.criar_notas(nome_nota, nota, id)
-        elif event in button_names:
-            # Cria uma nova janela de anotações
-            note_window = editar_nota(event)
+            if nome_nota not in notas_salvas:
+                if nome_nota != '':
+                    note_window = editar_nota(nome_nota)
+                    while True:
+                        note_event, note_values = note_window.read()
+                        nota = note_values["-ANOTAÇÃO-"]
+                        if note_event in (sg.WINDOW_CLOSED, 'Voltar'):
+                            note_window.close()
+                            break
+                        elif note_event == 'Salvar':
+                            sg.popup_timed("Nota criada com sucesso!")
+                            bc.criar_notas(nome_nota, nota, id)
+                            note_window.close()
+                            window["-NOMENOTA-"].update("")
+                            window["-LISTA-"].update(bc.mostrar_notas(id))
+                            break
+                        elif note_event == "Voltar":
+                            note_window.close()
+                            break
+                        elif note_event == sg.WINDOW_CLOSED:
+                            quit()
+                else:
+                    sg.popup_timed("você deve colocar um título para a nota", auto_close=5)
+            else:
+                sg.popup_timed("você não pode criar uma nota com um título já utilizado", auto_close=5)
+        elif event == '-LISTBOX-DOUBLE_CLICK':
+            titulo = values['-LISTA-']
+            nota = bc.ler_nota(titulo[0][0], id)
+            note_window = editar_nota(titulo[0][0], nota)
+            note_event, note_values = note_window.read()
+            while True:
+                nota = note_values["-ANOTAÇÃO-"]
+                if note_event in (sg.WINDOW_CLOSED, 'Voltar'):
+                    note_window.close()
+                    window["-NOMENOTA-"].update("")
+                    break
+                elif note_event == 'Salvar':
+                    sg.popup_timed("Nota atualizada com sucesso!", auto_close=5)
+                    bc.modificar_nota(nota, titulo[0][0], id)
+                    note_window.close()
+                    break
+                elif note_event == 'Deletar':
+                    sg.popup_timed("Nota deletada.", auto_close_duration=5)
+                    bc.deletar_nota(titulo[0][0], id)
+                    note_window.close()
+                    window["-NOMENOTA-"].update("")
+                    window["-LISTA-"].update(bc.mostrar_notas(id))
+                    break
+                elif note_event == 'Voltar':
+                    note_window.close()
+                    break
         elif event == "Voltar":
             window.close()
             front2()
-        elif event == 'Deletar':
-            # Remover o botão da lista de botões e atualizar o layout
-            button_name = values['-BUTTON_NAME-']
-            button_names.remove(button_name)
-            window['-BUTTON_LIST-'].update('')
-            for name in button_names:
-                button = [
-                    sg.Button(name, key=name, button_color="#4169E1", size=(15, 1))]
-                window.extend_layout(window['-BUTTON_LIST-'], [button])
+
+
 #   Inserindo janela de edição de perfil
-
-
 def senha_nova(id):
     sg.theme("DarkGrey16")
     frame = [

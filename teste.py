@@ -1,38 +1,29 @@
 import PySimpleGUI as sg
 
-# Layout da interface
-layout = [
-    [sg.Button('Botão 1', key='-BOTAO1-', bind_return_key=True)],
-    [sg.Button('Botão 2', key='-BOTAO2-')],
-    [sg.Button('Botão 3', key='-BOTAO3-')],
-    [sg.Text('Pressione "1" para Botão 1, "2" para Botão 2, "3" para Botão 3')]
+layout_frame_salvos = [
+    [sg.Column([], key='-BUTTON_LIST-')],
+    [sg.Listbox(values="", size=(400, 190), key='-LISTBOX-', select_mode=sg.LISTBOX_SELECT_MODE_SINGLE)]
 ]
 
-# Criação da janela
-window = sg.Window('Bind Teclas para Botões', layout,
-                   return_keyboard_events=True)
+frame_salvos = sg.Frame(
+    "Notas Salvas", layout_frame_salvos, size=(400, 190))
 
-# Loop principal de eventos
+window = sg.Window('Exemplo de Listbox com Duplo Clique')
+
+# Abrindo a janela antes de acessar o widget
+window.finalize()
+
+# Obtendo o widget Listbox dentro do Frame
+listbox_widget = frame_salvos.find_element('-LISTBOX-').Widget
+
+# Vinculando o evento de duplo clique ao Listbox
+listbox_widget.bind('<Double-1>', lambda event: window.write_event_value('-LISTBOX-DOUBLE_CLICK', ''))
+
 while True:
     event, values = window.read()
-
-    # Saída do loop principal ao fechar a janela
-    if event == sg.WIN_CLOSED:
+    if event == sg.WINDOW_CLOSED:
         break
+    elif event == '-LISTBOX-DOUBLE_CLICK':
+        print("Duplo clique no Listbox dentro do Frame")
 
-    # Verifica qual botão foi pressionado ou qual tecla foi capturada
-    if event == '-BOTAO1-':
-        sg.popup('Botão 1 pressionado')
-    elif event == '-BOTAO2-':
-        sg.popup('Botão 2 pressionado')
-    elif event == '-BOTAO3-':
-        sg.popup('Botão 3 pressionado')
-    elif event == '1':
-        window['-BOTAO1-'].click()
-    elif event == '2':
-        window['-BOTAO2-'].click()
-    elif event == '3':
-        window['-BOTAO3-'].click()
-
-# Fechamento da janela
 window.close()
