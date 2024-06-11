@@ -364,7 +364,7 @@ def eventos():
         elif button == "-DEL-":
             if values["-TABLE-"]:
                 index = values["-TABLE-"][0] + 1
-                bc.deletar(tipo, index, id)
+                bc.deletar(index, id)
                 conteudo = bc.ler_eventos(id)
                 window["-TABLE-"].update(conteudo)
                 window["-EVENTO-"].update("")
@@ -903,7 +903,7 @@ def anotações():
     def editar_nota(note_name):
         layout = [
             [sg.Text(f"Anotações para {note_name}")],
-            [sg.Multiline(size=(40, 10), key='-ANOTAÇÃO-')],
+            [sg.Multiline(size=(50, 10), key='-ANOTAÇÃO-')],
             [sg.Button('Salvar', button_color="#4169E1"), sg.Button(
                 'Deletar', button_color="#4169E1"), sg.Button('Voltar', button_color="#4169E1")]
         ]
