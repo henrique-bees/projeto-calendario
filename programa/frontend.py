@@ -1258,30 +1258,24 @@ def front2():
             font=("Arial", 15))]
     ]
 
-    layout_despertador = [
-
-    ]
 
     layout_frame_anotações = [
-
+        [sg.Multiline(size=(500,210), disabled=True)]
     ]
 
     frame_anotações = sg.Frame(
-        "Anotações Recentes", layout_frame_anotações, size=(500, 100))
-    frame_despertador = sg.Frame(
-        "Alarmes Recentes", layout_despertador, size=(500, 100))
+        "Última Anotação", layout_frame_anotações, size=(500, 210))
 
     # Frame interno que contém os botões
     frame_interno = sg.Frame(None, buttons_layout, size=(500, 45))
 
     frame_proximos_eventos = sg.Frame(
-        "Proximos Eventos", layout_frame_proximos_eventos, size=(500, 150))
+        "Próximos Eventos", layout_frame_proximos_eventos, size=(500, 150))
     # Layout do frame externo que contém o frame interno
     layout_do_frame_externo = [
         [frame_interno],
         [sg.HorizontalSeparator()],
         [frame_proximos_eventos],
-        [frame_despertador],
         [frame_anotações],
         [sg.VPush()],
         [sg.Column([
@@ -1299,7 +1293,7 @@ def front2():
 
     # Janela
     window = sg.Window("Agenda", layout, size=(
-        500, 620), element_justification="left", finalize=True)
+        500, 520), element_justification="left", finalize=True)
 
     update(window)
 
