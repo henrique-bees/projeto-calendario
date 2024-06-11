@@ -287,9 +287,9 @@ def eventos():
             font=("None 15"), size=(10, 1), disabled=True, no_scrollbar=True,
             key="-DATA-"),
          sg.Text('Hora'), sg.Combo(
-             [f'{i:02d}' for i in range(24)], key='-HORA-', size=(5, 1), readonly=True),
+             [f'{i:02d}' for i in range(24)], butoon_arrow_color="#4169E1", key='-HORA-', size=(5, 1), readonly=True),
          sg.Text('Minuto'), sg.Combo(
-             [f'{i:02d}' for i in range(60)], key='-MINUTO-', size=(5, 1), readonly=True)],
+             [f'{i:02d}' for i in range(60)], button_arrow_color="#4169E1", key='-MINUTO-', size=(5, 1), readonly=True)],
         # Input de nota
         [sg.T("Insira o seu evento:", size=(16, 1)), sg.I(
             key="-EVENTO-", font=("None 15"), size=(40, 1))],
@@ -298,7 +298,7 @@ def eventos():
         # Criar a Tabela com index, data, nota
         # Headings são os titulos, col_widths são os tamanhos das colunas
         [sg.Table(values=conteudo, headings=["Index", "Data / Hora", "Evento"],
-                  key="-TABLE-", enable_events=True, size=(500, 10),
+                  key="-TABLE-", sbar_arrow_color="#4169E1", enable_events=True, size=(500, 10),
                   auto_size_columns=False, col_widths=[5, 14, 23],
                   vertical_scroll_only=True, justification="l",
                   font=("None 15"))],
@@ -783,7 +783,7 @@ def alarmes():
 
     layout_frame_alarmes = [
         [sg.Text('Alarmes:', font=("Arial", 10), text_color="#4169E1")],
-        [sg.Listbox(values=[], key='-ALARMS-', size=(30, 400),
+        [sg.Listbox(values=[],sbar_arrow_color="#4169E1" , key='-ALARMS-', size=(30, 400),
                     enable_events=True, horizontal_scroll=True)]
     ]
 
@@ -904,7 +904,7 @@ def anotações():
     def editar_nota(note_name, nota=""):
         layout = [
             [sg.Text(f"Anotações para {note_name}")],
-            [sg.Multiline(default_text=nota,size=(40, 10), key='-ANOTAÇÃO-')],
+            [sg.Multiline(default_text=nota, sbar_arrow_color="#4169E1", size=(40, 10), key='-ANOTAÇÃO-')],
             [sg.Button('Salvar', button_color="#4169E1"), sg.Button(
                 'Deletar', button_color="#4169E1"), sg.Button('Voltar', button_color="#4169E1")]
         ]
@@ -984,9 +984,11 @@ def anotações():
                         elif note_event == sg.WINDOW_CLOSED:
                             quit()
                 else:
-                    sg.popup_timed("você deve colocar um título para a nota", auto_close=5)
+                    sg.popup_timed(
+                        "você deve colocar um título para a nota", auto_close=5)
             else:
-                sg.popup_timed("você não pode criar uma nota com um título já utilizado", auto_close=5)
+                sg.popup_timed(
+                    "você não pode criar uma nota com um título já utilizado", auto_close=5)
         elif event == '-LISTBOX-DOUBLE_CLICK':
             titulo = values['-LISTA-']
             nota = bc.ler_nota(titulo[0][0], id)
@@ -999,7 +1001,8 @@ def anotações():
                     window["-NOMENOTA-"].update("")
                     break
                 elif note_event == 'Salvar':
-                    sg.popup_timed("Nota atualizada com sucesso!", auto_close=5)
+                    sg.popup_timed(
+                        "Nota atualizada com sucesso!", auto_close=5)
                     bc.modificar_nota(nota, titulo[0][0], id)
                     note_window.close()
                     break
@@ -1287,19 +1290,18 @@ def front2():
         [sg.Table(
             values=bc.eventos_recentes(id),
             headings=("DATA / HORA", "PROXIMOS EVENTOS"),
-            key="-TABLE-", enable_events=True, size=(500, 10),
+            key="-TABLE-", sbar_arrow_color="#4169E1", enable_events=True, size=(500, 10),
             auto_size_columns=False, col_widths=[14, 39],
             vertical_scroll_only=False, justification="l",
             font=("Arial", 15))]
     ]
-
-
+    ultima_nota = bc.ultima_nota(id)
     layout_frame_anotações = [
-        [sg.Multiline(size=(500,210), disabled=True)]
+        [sg.Multiline(default_text=ultima_nota[1], sbar_arrow_color="#4169E1", size=(500, 210), disabled=True)]
     ]
 
     frame_anotações = sg.Frame(
-        "Última Anotação", layout_frame_anotações, size=(500, 210))
+        f"Última Anotação - {ultima_nota[0]}", layout_frame_anotações, size=(500, 210))
 
     # Frame interno que contém os botões
     frame_interno = sg.Frame(None, buttons_layout, size=(500, 45))

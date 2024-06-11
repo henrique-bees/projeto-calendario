@@ -124,6 +124,15 @@ def deletar_nota(titulo, id):
     conexao.close()
 
 
+def ultima_nota(id):
+    conexao = sq.connect("programa/registro.db")
+    cursor = conexao.cursor()
+    cursor.execute("SELECT titulo, nota FROM notas WHERE id_notas = ? ORDER BY id DESC", (id,))
+    resultado = cursor.fetchone()
+    conexao.close()
+    return resultado
+
+
 def criar_alarme(nome, data, nota, id):
     conexao = sq.connect("programa/registro.db")
     cursor = conexao.cursor()
