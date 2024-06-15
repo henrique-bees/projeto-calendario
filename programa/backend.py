@@ -64,9 +64,9 @@ def verificar_registro(usuario):
         busca = cursor.fetchone()
         conexao.close()
         if busca is not None:
-            return "invalido"
+            return "existe"
         else:
-            return "valido"
+            return "não existe"
 
 
 def eventos_recentes(id):
@@ -101,7 +101,8 @@ def mostrar_notas(id):
 def ler_nota(titulo, id):
     conexao = sq.connect("programa/registro.db")
     cursor = conexao.cursor()
-    cursor.execute("SELECT nota FROM notas WHERE titulo = ? and id_notas = ?", (titulo, id))
+    cursor.execute(
+        "SELECT nota FROM notas WHERE titulo = ? and id_notas = ?", (titulo, id))
     resultado = cursor.fetchone()
     conexao.close()
     return resultado[0]
@@ -119,7 +120,8 @@ def modificar_nota(nota, titulo, id):
 def deletar_nota(titulo, id):
     conexao = sq.connect("programa/registro.db")
     cursor = conexao.cursor()
-    cursor.execute("DELETE FROM notas WHERE titulo = ? and id_notas = ?", (titulo, id))
+    cursor.execute(
+        "DELETE FROM notas WHERE titulo = ? and id_notas = ?", (titulo, id))
     conexao.commit()
     conexao.close()
 
@@ -127,7 +129,8 @@ def deletar_nota(titulo, id):
 def ultima_nota(id):
     conexao = sq.connect("programa/registro.db")
     cursor = conexao.cursor()
-    cursor.execute("SELECT titulo, nota FROM notas WHERE id_notas = ? ORDER BY id DESC", (id,))
+    cursor.execute(
+        "SELECT titulo, nota FROM notas WHERE id_notas = ? ORDER BY id DESC", (id,))
     resultado = cursor.fetchone()
     conexao.close()
     return resultado
