@@ -50,9 +50,11 @@ def eventos():
             font=("None 15"), size=(10, 1), disabled=True, no_scrollbar=True,
             key="-DATA-"),
          sg.Text('Hora'), sg.Combo(
-             [f'{i:02d}' for i in range(24)], button_arrow_color="#4169E1", key='-HORA-', size=(5, 1), readonly=True),
+             [f'{i:02d}' for i in range(24)], button_arrow_color="#4169E1",
+             key='-HORA-', size=(5, 1), readonly=True),
          sg.Text('Minuto'), sg.Combo(
-             [f'{i:02d}' for i in range(60)], button_arrow_color="#4169E1", key='-MINUTO-', size=(5, 1), readonly=True)],
+             [f'{i:02d}' for i in range(60)], button_arrow_color="#4169E1",
+             key='-MINUTO-', size=(5, 1), readonly=True)],
         # Input de nota
         [sg.T("Insira o seu evento:", size=(16, 1)), sg.I(
             key="-EVENTO-", font=("None 15"), size=(40, 1))],
@@ -61,18 +63,19 @@ def eventos():
         # Criar a Tabela com index, data, nota
         # Headings são os titulos, col_widths são os tamanhos das colunas
         [sg.Table(values=conteudo, headings=["Index", "Data / Hora", "Evento"],
-                  key="-TABLE-", sbar_arrow_color="#4169E1", enable_events=True, size=(500, 10),
-                  auto_size_columns=False, col_widths=[5, 14, 23],
-                  vertical_scroll_only=True, justification="l",
-                  font=("None 15"))],
+                  key="-TABLE-", sbar_arrow_color="#4169E1",
+                  enable_events=True, size=(500, 10), auto_size_columns=False,
+                  col_widths=[5, 14, 23], vertical_scroll_only=True,
+                  justification="l", font=("None 15"))],
 
         # Criar coluna, inserir botões de adicionar e deletar, dar keys a eles.
         [sg.Column([
-            [sg.B("Adicionar", size=(20, 2), button_color="#4169E1", bind_return_key=True),
+            [sg.B("Adicionar", size=(20, 2), button_color="#4169E1",
+                  bind_return_key=True),
              sg.B("Deletar", size=(20, 2), button_color="#4169E1",
-                  key="-DEL-"), sg.Button("Voltar para página anterior",
-                                          size=(20, 2),
-                                          button_color="#4169E1"), ]],
+                  key="-DEL-"),
+             sg.Button("Voltar para página anterior", size=(20, 2),
+                       button_color="#4169E1"), ]],
             element_justification="center", expand_x=True, pad=(0, (10, 0)))],
     ]
     # Info Janela
@@ -104,10 +107,13 @@ def eventos():
                     selected_hour = datetime.strptime(hora_selecionada,
                                                       '%H:%M')
                     current_hour = datetime.strptime(hora_atual, '%H:%M')
-                    if selected_date < datetime.now().date() or (selected_date == datetime.now().date() and selected_hour < current_hour):
-                        sg.popup(
-                            "Você não pode adicionar um evento com data no passado!",
-                            button_color="#4169E1")
+                    if selected_date < datetime.now().date() or \
+                            (selected_date == datetime.now().date() and
+                             selected_hour < current_hour):
+                        sg.popup_no_buttons(
+                            "Essa data já passou.\n"
+                            "Selecione uma data no futuro.",
+                            title="ERRO")
                     else:
                         titulo = values["-EVENTO-"]
                         data = data_selecionada + " / " + hora_selecionada
@@ -117,11 +123,11 @@ def eventos():
                         window["-TABLE-"].update(conteudo)
                         window["-EVENTO-"].update("")
                 else:
-                    sg.popup_timed("É necessário inserir um horario",
-                                   auto_close_duration=2)
+                    sg.popup_no_buttons("É necessário inserir um horario",
+                                        title="ERRO")
             else:
-                sg.popup_timed("É necessário inserir uma tarefa",
-                               auto_close_duration=2)
+                sg.popup_no_buttons("É necessário inserir uma tarefa",
+                                    title="ERRO")
 
         # Botão de deletar alguma nota
         elif button == "-DEL-":
@@ -157,12 +163,18 @@ def relógio():
 
     frame_layout_hora = [
         [sg.Column([
-            [sg.Frame(None, [[sg.Text("00", font=("Arial", 30), key='-HORAS_DIGITS-')]], size=(64, 60), relief='ridge'),
+            [sg.Frame(None,
+                      [[sg.Text("00", font=("Arial", 30),
+                                key='-HORAS_DIGITS-')]],
+                      size=(64, 60), relief='ridge'),
              sg.Text(":", font=("Arial", 20)),
              sg.Frame(None, [[sg.Text("00", font=("Arial", 30),
-                                      key='-MINUTOS_DIGITS-')]], size=(64, 60), relief='ridge'),
+                                      key='-MINUTOS_DIGITS-')]],
+                      size=(64, 60), relief='ridge'),
              sg.Text(":", font=("Arial", 20)),
-             sg.Frame(None, [[sg.Text("00", font=("Arial", 30), key='-SEGUNDOS_DIGITS-')]], size=(64, 60), relief='ridge')]],
+             sg.Frame(None, [[sg.Text("00", font=("Arial", 30),
+                                      key='-SEGUNDOS_DIGITS-')]],
+                      size=(64, 60), relief='ridge')]],
             # Reduziu a distância superior da coluna
             expand_x=True, pad=(15, 15, 15, 0))]
     ]
@@ -170,7 +182,8 @@ def relógio():
 
     digits_frame_layout = [
         [sg.Column([
-            [sg.Text("HORA ATUAL", font=("Arial", 20))]],   expand_x=True, pad=(60, 20, 0, 10))],
+            [sg.Text("HORA ATUAL", font=("Arial", 20))]], expand_x=True,
+            pad=(60, 20, 0, 10))],
         [frame_hora],
         [sg.VPush()],
         [sg.HorizontalSeparator()],
@@ -227,22 +240,32 @@ def cronômetro():
 
     # Frame com os botões
     buttons_layout = [
-        [sg.Button("INICIAR", key='-START-', button_color="#4169E1", size=(11, 2)),
+        [sg.Button("INICIAR", key='-START-', button_color="#4169E1",
+                   size=(11, 2)),
          sg.Button("PAUSAR", key='-PAUSE-',
                    button_color="#4169E1", size=(11, 2)),
-         sg.Button("RESETAR", key='-RESET-', button_color="#4169E1", size=(11, 2))]
+         sg.Button("RESETAR", key='-RESET-', button_color="#4169E1",
+                   size=(11, 2))]
     ]
     buttons_frame = sg.Frame(None, buttons_layout,
                              size=(320, 50), relief='sunken')
 
     frame_layout_hora = [
         [sg.Column([
-            [sg.Frame(None, [[sg.Text("00", font=("Arial", 30), key='-HORAS_DIGITS-')]], size=(64, 60), relief='ridge'),
+            [sg.Frame(None,
+                      [[sg.Text("00", font=("Arial", 30),
+                                key='-HORAS_DIGITS-')]],
+                      size=(64, 60), relief='ridge'),
              sg.Text(":", font=("Arial", 20)),
-             sg.Frame(None, [[sg.Text("00", font=(
-                 "Arial", 30), key='-MINUTOS_DIGITS-')]], size=(64, 60), relief='ridge'),
+             sg.Frame(None,
+                      [[sg.Text("00", font=("Arial", 30),
+                                key='-MINUTOS_DIGITS-')]],
+                      size=(64, 60), relief='ridge'),
              sg.Text(":", font=("Arial", 20)),
-             sg.Frame(None, [[sg.Text("00", font=("Arial", 30), key='-SEGUNDOS_DIGITS-')]], size=(64, 60), relief='ridge')]],
+             sg.Frame(None,
+                      [[sg.Text("00", font=("Arial", 30),
+                                key='-SEGUNDOS_DIGITS-')]],
+                      size=(64, 60), relief='ridge')]],
             # Reduziu a distância superior da coluna
             expand_x=True, pad=(15, 15, 15, 0))]
     ]
@@ -250,7 +273,8 @@ def cronômetro():
 
     digits_frame_layout = [
         [sg.Column([
-            [sg.Text("CRONÔMETRO", font=("Arial", 20))]], expand_x=True, pad=(50, 10, 0, 10))],
+            [sg.Text("CRONÔMETRO", font=("Arial", 20))]], expand_x=True,
+            pad=(50, 10, 0, 10))],
         [frame_hora],
         [sg.VPush()],
         [sg.HorizontalSeparator()],

@@ -5,16 +5,17 @@ def criar_eventos(data, titulo, id):
     conexao = sq.connect("programa/registro.db")
     cursor = conexao.cursor()
     try:
-        query = "SELECT MAX(posição) FROM eventos WHERE id_pins = ?"
-        cursor.execute(query, (id,))
+        cursor.execute(
+            "SELECT MAX(posição) FROM eventos WHERE id_pins = ?", (id,))
         resultado = cursor.fetchone()[0]
         if resultado is not None:
             index = resultado + 1
         else:
             index = 1
     finally:
-        query = "INSERT INTO eventos (posição, data, titulo, id_pins) VALUES (?, ?, ?, ?)"
-        cursor.execute(query, (index, data, titulo, id))
+        cursor.execute(
+            "INSERT INTO eventos (posição, data, titulo, id_pins)"
+            " VALUES (?, ?, ?, ?)", (index, data, titulo, id))
         conexao.commit()
         conexao.close()
         return index
@@ -23,10 +24,11 @@ def criar_eventos(data, titulo, id):
 def deletar_eventos(index, id):
     conexao = sq.connect("programa/registro.db")
     cursor = conexao.cursor()
-    query = "DELETE FROM eventos WHERE posição = ? and id_pins = ?"
-    cursor.execute(query, (index, id,))
-    query = "UPDATE eventos SET posição = posição - 1 WHERE id_pins = ? AND posição > ?"
-    cursor.execute(query, (id, index))
+    cursor.execute(
+        "DELETE FROM eventos WHERE posição = ? and id_pins = ?", (index, id,))
+    cursor.execute(
+        "UPDATE eventos SET posição = posição - 1 WHERE id_pins = ? AND"
+        " posição > ?", (id, index))
     conexao.commit()
     conexao.close()
 
@@ -34,8 +36,8 @@ def deletar_eventos(index, id):
 def ler_eventos(id):
     conexao = sq.connect("programa/registro.db")
     cursor = conexao.cursor()
-    query = "SELECT posição, data, titulo FROM eventos WHERE id_pins = ?"
-    cursor.execute(query, (id,))
+    cursor.execute(
+        "SELECT posição, data, titulo FROM eventos WHERE id_pins = ?", (id,))
     conteudo = cursor.fetchall()
     conexao.close()
     return conteudo
@@ -84,7 +86,8 @@ def criar_notas(titulo, nota, id):
     conexao = sq.connect("programa/registro.db")
     cursor = conexao.cursor()
     cursor.execute(
-        "INSERT INTO notas (titulo, nota, id_notas) VALUES (?, ?, ?)", (titulo, nota, id))
+        "INSERT INTO notas (titulo, nota, id_notas) VALUES (?, ?, ?)",
+        (titulo, nota, id))
     conexao.commit()
     conexao.close()
 
@@ -102,7 +105,8 @@ def ler_nota(titulo, id):
     conexao = sq.connect("programa/registro.db")
     cursor = conexao.cursor()
     cursor.execute(
-        "SELECT nota FROM notas WHERE titulo = ? and id_notas = ?", (titulo, id))
+        "SELECT nota FROM notas WHERE titulo = ? and id_notas = ?",
+        (titulo, id))
     resultado = cursor.fetchone()
     conexao.close()
     return resultado[0]
@@ -112,7 +116,8 @@ def modificar_nota(nota, titulo, id):
     conexao = sq.connect("programa/registro.db")
     cursor = conexao.cursor()
     cursor.execute(
-        "UPDATE notas SET nota = ? WHERE titulo = ? and id_notas = ?", (nota, titulo, id))
+        "UPDATE notas SET nota = ? WHERE titulo = ? and id_notas = ?",
+        (nota, titulo, id))
     conexao.commit()
     conexao.close()
 
@@ -130,26 +135,8 @@ def ultima_nota(id):
     conexao = sq.connect("programa/registro.db")
     cursor = conexao.cursor()
     cursor.execute(
-        "SELECT titulo, nota FROM notas WHERE id_notas = ? ORDER BY id DESC", (id,))
-    resultado = cursor.fetchone()
-    conexao.close()
-    return resultado
-
-
-def criar_alarme(nome, data, nota, id):
-    conexao = sq.connect("programa/registro.db")
-    cursor = conexao.cursor()
-    cursor.execute(
-        "INSERT INTO alarmes (nome, data, nota, id_alarmes) VALUES (?, ?, ?, ?)", (nome, data, nota, id))
-    conexao.commit()
-    conexao.close()
-
-
-def ler_alarmes(id):
-    conexao = sq.connect("programa/registro.db")
-    cursor = conexao.cursor()
-    cursor.execute(
-        "SELECT nome, data, nota FROM alarmes WHERE id_alarmes = ? ORDER BY data", (id,))
+        "SELECT titulo, nota FROM notas WHERE id_notas = ? ORDER BY id DESC",
+        (id,))
     resultado = cursor.fetchone()
     conexao.close()
     return resultado

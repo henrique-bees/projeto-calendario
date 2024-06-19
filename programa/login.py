@@ -53,9 +53,8 @@ def login():
             busca = cursor.fetchone()
             conexao.close()
             if busca is not None and busca[1] == senha:
-                sg.popup_no_buttons(
-                    "Login efetuado com sucesso, bem-vindo",
-                    auto_close_duration=3, title="Login efetuado")
+                sg.popup_quick_message(
+                    "Login efetuado com sucesso, bem-vindo")
                 (usuario, senha)
                 window.close()
                 id = busca[2]
@@ -143,8 +142,8 @@ def registro():
                         conexao.commit()
                         conexao.close()
                         window.close()
-                        sg.popup_no_buttons("Registro realizado com sucesso!",
-                                            auto_close=3, title="Conta criada")
+                        sg.popup_quick_message(
+                            "Registro realizado com sucesso!")
                         return "login"
                     else:
                         sg.popup_no_buttons(
@@ -221,9 +220,8 @@ def nova_senha_deslogado():
                         conexao.commit()
                         conexao.close()
                         window.close()
-                        sg.popup_no_buttons(
-                            "A nova senha foi cadastrada com sucesso!",
-                            auto_close_duration=3, title="Senha modificada")
+                        sg.popup_quick_message(
+                            "A nova senha foi cadastrada com sucesso!")
                         return "login"
                     else:
                         sg.popup_no_buttons(
@@ -311,10 +309,8 @@ def nova_senha_logado(id):
                             conexao.commit()
                             conexao.close()
                             window.close()
-                            sg.popup_no_buttons(
-                                "A nova senha foi cadastrada com sucesso!",
-                                auto_close_duration=3, title="Senha modificada"
-                            )
+                            sg.popup_quick_message(
+                                "A nova senha foi cadastrada com sucesso!")
                             return "editar perfil"
                         else:
                             sg.popup_no_buttons("A senha atual está incorreta",
